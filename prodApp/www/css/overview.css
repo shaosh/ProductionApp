@@ -1,0 +1,19 @@
+.item-avatar:nth-child(odd){
+	background-color: #ccc;
+}
+
+select{
+	width: 100%;
+	height: 34px;
+	font-size: 14px;
+	line-height: 16px;
+	border-color: #ddd;
+}
+
+img { 
+   border:1px solid #021a40;
+}
+
+.button{
+	margin-right: 5px;
+}

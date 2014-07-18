@@ -1,0 +1,65 @@
+<ion-view title="Job Details">
+    <div class="bar bar-subheader bar-stable">
+        <!-- <h2 class="title">{{user.role}}: {{user.name}}</h2> -->
+        <h2 class="title">{{job.name}} ({{job.id}})</h2>
+        <button class="button button-dark">Log Out</button>
+    </div>    
+    <ion-content class="has-subheader has-footer">
+        <div id="previewdiv">
+            <img ng-repeat="preview in previews" src="/img/jobs/{{job.id}}/{{preview.name}}.jpg" alt="{{preview.location}}" title="{{preview.location}}">
+        </div>
+        <div id="upcusdiv"></div>
+        <div id="detaildiv" class="list list-inset">
+            <div class="item">
+                ID:
+            </div>
+            <div class="item">
+                Facility:
+            </div>
+            <div class="item">
+                Name:
+            </div>
+            <div class="item">
+                Admin Statuses:
+            </div>
+            <div class="item">
+                Ship by Date:
+            </div>
+            <div class="item">
+                Ink Colors:
+            </div>
+            <div class="item">
+                Substitute Notes/Product Name:
+            </div>
+            <div class="item">
+                Quantities by Size:
+            </div>
+        </div>
+        <div id="downcusdiv"></div>
+        <!-- <div class="list list-inset">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="query">
+            </label>
+            <br>
+            <select ng-model="orderProp">
+                <option value="" selected disabled>--Sort by--</option>
+                <option value="name">Name</option>
+                <option value="id">Job ID</option>
+                <option value="date">Added Date</option>
+                <option value="facility">Facility Location</option>
+                <option value="status">Status</option>
+            </select>
+        </div>
+        <ion-list>
+            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp" class="item item-avatar" href="/job/{{job.id}}">
+                <img src="/img/jobs/{{job.id}}.jpg">
+                <h2>Job Name: {{job.name}}</h2>
+                <p>Job ID: {{job.id}}</p>
+            </a>
+        </ion-list>   -->
+    </ion-content>
+    <div class="bar bar-footer bar-dark">
+        <div class="title">DAS Production V2</div>
+    </div>
+</ion-view>
