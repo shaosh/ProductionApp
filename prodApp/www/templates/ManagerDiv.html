@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-33">
+        <select>
+            <option value="" selected disabled>--Prep--</option>
+            <option ng-repeat="prep in preps" value="{{prep.id}}">{{prep.name}}</option>
+            <!-- <option value="0">Name</option>
+            <option value="1">Job ID</option>
+            <option value="2">Added Date</option>
+            <option value="3">Facility Location</option>
+            <option value="4">Status</option> -->
+        </select>
+    </div>
+    <div class="col-33">
+        <select>
+            <option value="" selected disabled>--Printer--</option>
+            <option ng-repeat="printer in printers" value="{{printer.id}}">{{printer.name}}</option>
+           <!--  <option value="0">Name</option>
+            <option value="1">Job ID</option>
+            <option value="2">Added Date</option>
+            <option value="3">Facility Location</option>
+            <option value="4">Status</option> -->
+        </select>
+    </div>
+    <div class="col-33">
+        <button class="button button-positive" id="assignbtn">
+            Assign the Job
+        </button>
+    </div>

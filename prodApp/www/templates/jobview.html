@@ -1,15 +1,30 @@
-<ion-view title="Job Details">
+<ion-view title="Job Details: {{job.name}} ({{job.id}})">
     <div class="bar bar-subheader bar-stable">
-        <!-- <h2 class="title">{{user.role}}: {{user.name}}</h2> -->
-        <h2 class="title">{{job.name}} ({{job.id}})</h2>
+        <h2 class="title">{{user.role}}: {{user.name}}</h2>
+        <!-- <h2 class="title">{{job.name}} ({{job.id}})</h2> -->
         <button class="button button-dark">Log Out</button>
     </div>    
     <ion-content class="has-subheader has-footer">
-        <div id="previewdiv">
-            <img ng-repeat="preview in previews" src="/img/jobs/{{job.id}}/{{preview.name}}.jpg" alt="{{preview.location}}" title="{{preview.location}}">
+        <div id="managerdiv" class="cusdiv contentdiv" ng-include="ManagerDiv"></div> 
+        <div id="previewdiv" class="contentdiv">
+            <div ng-repeat="preview in previews" 
+                 ng-click="selectedLocation($index, preview.name)" 
+                 ng-class="{'highlighted': $index==selectedImg,
+                            'unhighlighted': $index!=selectedImg} " >
+                <img                     
+                    ng-src="/img/jobs/{{job.id}}/{{preview.name}}.jpg" 
+                    alt="{{preview.location}}" 
+                    title="{{preview.location}}" >
+            </div>
         </div>
-        <div id="upcusdiv"></div>
-        <div id="detaildiv" class="list list-inset">
+        <div id="large-preview" class="contentdiv"
+             ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
+            <img ng-src=" {{selectedImgSrc}} "  
+                 alt="{{largePreviewText}}" 
+                 title="{{largePreviewText}}" >
+            <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div>     
+        </div>            
+        <div id="detaildiv" class="list list-inset contentdiv">
             <div class="item">
                 ID:
             </div>
@@ -35,7 +50,7 @@
                 Quantities by Size:
             </div>
         </div>
-        <div id="downcusdiv"></div>
+        <div class="cusdiv contentdiv" id="printerdiv" ng-include="PrinterDiv" ></div>
         <!-- <div class="list list-inset">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>

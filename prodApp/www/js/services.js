@@ -18,6 +18,16 @@ angular.module('starter.services', [])
 					return users[i];
 			}
 			return null;
+		},
+
+		getUsersByRole: function(role){
+			var userList = [];
+			for(var i = 0; i < users.length; i++){
+				if(users[i].role == role){
+					userList.push(users[i]);
+				}
+			}
+			return userList;
 		}
 	}
 })

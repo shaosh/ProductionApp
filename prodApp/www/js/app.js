@@ -62,7 +62,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     })
 
     .state('jobview', {
-      url: '/job/:jobId',
+      url: '/job/:jobId-:userId',
       templateUrl: "templates/jobview.html", 
       controller: 'JobviewCtrl'
     });
