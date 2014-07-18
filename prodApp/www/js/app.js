@@ -29,12 +29,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
     .state('login', {
       url: '/login',
-      // views: {
-      //   'login':{
       templateUrl: "templates/login.html", 
       controller: 'LoginCtrl'
-      //   }
-      // }
     })
 
     .state('manager', {
@@ -45,7 +41,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
     .state('user', {
       url: "/user",
-      templateUrl: "templates/splash.html",
+      templateUrl: "templates/navview.html",
       abstract: true
     })
 
@@ -57,7 +53,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 
     .state('job', {
       url: "/job",
-      templateUrl: "templates/splash.html",
+      templateUrl: "templates/navview.html",
       abstract: true
     })
 
@@ -72,7 +68,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     //   templateUrl: "templates/jobview.html", 
     //   controller: 'JobviewCtrl'
     // });
-  $urlRouterProvider.otherwise('/');
+  
+  $urlRouterProvider.otherwise('/login');
+
+
+  //   $urlRouterProvider.otherwise(
+  //     function(){
+  //       if($cookieStore)
+  //     }
+  //   );
+  // if($cookieStore.get(username))
+  //   $location.path('/user/' + user.id);
 
 });
 

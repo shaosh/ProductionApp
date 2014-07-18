@@ -20,6 +20,14 @@ angular.module('starter.services', [])
 			return null;
 		},
 
+		getUserByName: function(userName){
+			for(var i = 0; i < users.length; i++){
+				if(users[i].name == userName)
+					return users[i];
+			}
+			return null;
+		},
+
 		getUsersByRole: function(role){
 			var userList = [];
 			for(var i = 0; i < users.length; i++){

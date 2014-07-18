@@ -1,14 +1,15 @@
 <ion-view title="DAS Production App">
 	<ion-content>
 		<div class="list list-inset">
+            <p class="assertive">{{logindata.alert}}&nbsp;</p>
 		  	<label class="item item-input">
-		    	<input type="text" placeholder="User Name">
+		    	<input type="text" placeholder="User Name" ng-model="logindata.username" required>
 		  	</label>
 		  	<label class="item item-input">
-		    	<input type="password" placeholder="Password">
+		    	<input type="password" placeholder="Password" ng-model="logindata.password">
 		  	</label>
             <label class="item item-input">
-                <select>
+                <select ng-model="logindata.roleid">
                     <option value="" disabled selected>--Role--</option>
                     <option value="0">Prep</option>
                     <option value="1">Printer</option>
@@ -16,7 +17,7 @@
                     <option value="3">Quality Control</option>
                 </select>
             </label>
-		  	<button class="button button-block button-positive">
+		  	<button class="button button-block button-positive" ng-click="login()">
 			  	Sign In
 			</button>
 		</div>    

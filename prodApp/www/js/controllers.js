@@ -1,9 +1,44 @@
 
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ngCookies'])
 
-.controller('LoginCtrl', function($scope, cssInjector){
+.controller('LoginCtrl', function($scope, $location, $cookieStore, cssInjector, User){
+	if(
+		$cookieStore.get("username") != undefined &&
+		$cookieStore.get("password") != undefined &&
+		$cookieStore.get("roleid") != undefined &&
+		$cookieStore.get("authenticated") == "true"
+	){
+		$location.path('/user/0');
+	}
+
 	cssInjector.removeAll();
 	cssInjector.add('/css/login.css');    
+	$scope.logindata = {};
+
+
+
+
+	$scope.login = function(){
+		var username = $scope.logindata.username;
+		var password = $scope.logindata.password;
+		var roleid = $scope.logindata.roleid;
+		if(username == undefined || password == undefined || roleid == undefined){
+			$scope.logindata.alert = "Error: Incomplete Authentication Information";
+			$scope.logindata.username ;
+			return;
+		}
+		var user = User.getUserByName(username);
+		if(user != null){
+			$cookieStore.put("username", username);
+			$cookieStore.put("password", password);
+			$cookieStore.put("roleid", roleid);
+			$cookieStore.put("authenticated", "true");
+
+			$location.path('/user/' + user.id);
+		}
+		else
+			$scope.logindata.alert = "Error: Incorrect Authentication Information";
+	};
 })
 
 .controller('OverviewCtrl', function($scope, $stateParams, cssInjector, User, Jobs){

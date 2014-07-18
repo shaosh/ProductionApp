@@ -9,11 +9,6 @@
 	background-color: rgba(0,0,0,0.5);
 }
 
-#logodiv{
-	margin-top: 5%;
-	text-align: center;
-}
-
 .list{
 	background-color: transparent;
 }
@@ -41,8 +36,14 @@ option{
 	color:#000;
 }
 
-.list label, .button.button-block{
+.list label, .list p, .button.button-block{
 	margin-top: 2%;
+}
+
+.list p{
+	font-size: 14px;
+	line-height: 16px;
+	font-weight: bold;
 }
 
 .button.button-block{
