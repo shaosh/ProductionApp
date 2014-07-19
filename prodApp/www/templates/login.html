@@ -6,15 +6,15 @@
 		    	<input type="text" placeholder="User Name" ng-model="logindata.username" required>
 		  	</label>
 		  	<label class="item item-input">
-		    	<input type="password" placeholder="Password" ng-model="logindata.password">
+		    	<input type="password" placeholder="Password" ng-model="logindata.password" required>
 		  	</label>
             <label class="item item-input">
-                <select ng-model="logindata.roleid">
+                <select ng-model="logindata.roleid" required>
                     <option value="" disabled selected>--Role--</option>
                     <option value="0">Prep</option>
                     <option value="1">Printer</option>
                     <option value="2">QC</option>
-                    <option value="3">Quality Control</option>
+                    <option value="3">Manager</option>
                 </select>
             </label>
 		  	<button class="button button-block button-positive" ng-click="login()">

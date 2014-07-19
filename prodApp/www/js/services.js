@@ -66,6 +66,19 @@ angular.module('starter.services', [])
 			return null;
 		}
 	}
+})
+
+.factory('Account', function($location, $cookieStore){
+	return{
+		logoff: function(){
+			$cookieStore.put("authenticated", "false");
+			$location.path('/login');
+		},
+
+		overview: function(){
+			$location.path('/' + $cookieStore.get('username') + '/jobs');
+		}
+	}	
 });
 
 // .factory('Previews', function() {

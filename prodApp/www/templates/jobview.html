@@ -1,27 +1,31 @@
 <ion-view title="Job Details: {{job.name}} ({{job.id}})">
-    <div class="bar bar-subheader bar-stable">
-        <h2 class="title">{{user.role}}: {{user.name}}</h2>
+    <div class="bar bar-subheader bar-stable" ng-include="'/templates/subheader.html'">
+        <!-- <h2 class="title">{{user.role}}: {{user.name}}</h2> -->
         <!-- <h2 class="title">{{job.name}} ({{job.id}})</h2> -->
-        <button class="button button-dark">Log Out</button>
+        <!-- <button class="button button-dark" ng-click="logoff()">Log Out</button> -->
     </div>    
     <ion-content class="has-subheader has-footer">
+        <div class="contentdiv">
+            <p class="assertive">{{alert}}</p>
+        </div>
         <div id="managerdiv" class="cusdiv contentdiv" ng-include="ManagerDiv"></div> 
         <div id="previewdiv" class="contentdiv">
             <div ng-repeat="preview in previews" 
                  ng-click="selectedLocation($index, preview.name)" 
                  ng-class="{'highlighted': $index==selectedImg,
-                            'unhighlighted': $index!=selectedImg} " >
+                            'unhighlighted': $index!=selectedImg && !processing,
+                            'invalid': processing && $index != selectedImg} " >
                 <img                     
                     ng-src="/img/jobs/{{job.id}}/{{preview.name}}.jpg" 
                     alt="{{preview.location}}" 
-                    title="{{preview.location}}" >
+                    title="{{preview.location}}" style="height: 40px; width: 40px">
             </div>
         </div>
         <div id="large-preview" class="contentdiv"
              ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
             <img ng-src=" {{selectedImgSrc}} "  
                  alt="{{largePreviewText}}" 
-                 title="{{largePreviewText}}" >
+                 title="{{largePreviewText}}" style="width: 200px; height: 273px;">
             <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div>     
         </div>            
         <div id="detaildiv" class="list list-inset contentdiv">

@@ -1,7 +1,7 @@
-<ion-view title="Overview">
-    <div class="bar bar-subheader bar-stable">
-        <h2 class="title">{{user.role}}: {{user.name}}</h2>
-        <button class="button button-dark">Log Out</button>
+<ion-view title="Overview ({{jobs.length}} Jobs)">
+    <div class="bar bar-subheader bar-stable" ng-include="'/templates/subheader.html'">
+        <!-- <h2 class="title">{{user.role}}: {{user.name}}</h2>
+        <button class="button button-dark" ng-click="$logoff.logoff()">Log Out</button> -->
     </div>    
     <ion-content class="has-subheader has-footer">
         <div class="list list-inset">

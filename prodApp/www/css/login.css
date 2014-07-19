@@ -34,6 +34,7 @@ select{
 }
 option{
 	color:#000;
+	background-color: transparent;
 }
 
 .list label, .list p, .button.button-block{

@@ -47,15 +47,20 @@ angular.module('starter.controllers', ['ngCookies'])
 	};
 })
 
-.controller('OverviewCtrl', function($scope, $stateParams, cssInjector, User, Jobs){
+.controller('OverviewCtrl', function($scope, $stateParams, cssInjector, User, Jobs, Account){
 	cssInjector.removeAll();
 	cssInjector.add('/css/overview.css');
 	$scope.user = User.getUserByName($stateParams.username);
 	$scope.jobs = Jobs.all();
 	$scope.orderProp = '';
+
+	$scope.$logoff = Account;
+
+	//function to go to overview page
+	$scope.$overview = Account;
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs){
+.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs, Account){
 	cssInjector.removeAll();
 	cssInjector.add('/css/jobview.css');
 	var job = Jobs.get($stateParams.jobId);
@@ -70,29 +75,43 @@ angular.module('starter.controllers', ['ngCookies'])
 		$scope.preps = User.getUsersByRole(ROLES[0]);
 		$scope.printers = User.getUsersByRole(ROLES[1]);
 		$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
+		$scope.assignee = {};
+		$scope.assign = function(){
+			if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
+				$scope.alert = "Incomplete Info";
+			}
+		}
 	}
 	if(user.role == "Printer"){
 		$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
 	}
 	
+	//Tag to mark if a location is being printing. If so, the user can't select other printer location.
+	$scope.processing = false;
 
+	//funciton to select printer location
 	$scope.selectedLocation = function(img, location){
+		if($scope.processing)
+			return;
 		$scope.selectedImg = img;
 		$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
 		$scope.largePreviewText = location + " is not included in the design";
 	}
-	// $scope.$watch($('#previewdiv img').click(
-	// 		function(){
-	// 			$('#previewdiv img').removeClass('highlighted');
-	// 			$(this).addClass('highlighted');
-	// 		}
-	// 	)
 
-	// );
+	//function to process a printer location, and other locations can't be selected.
+	$scope.movetoNext = function(){
+		$scope.processing = true;
+	}
 
-	// $scope.user = User.get($stateParams.userId);
-	// $scope.jobs = Jobs.all();
-	// $scope.orderProp = '';
+	$scope.printNN = function(){
+		$scope.processing = true;
+	}
+
+	//function to log off
+	$scope.$logoff = Account;	
+
+	//function to go to overview page
+	$scope.$overview = Account;
 });
 
 var ROLES = ["Prep", "Printer", "QC", "Manager"];
