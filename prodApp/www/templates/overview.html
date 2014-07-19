@@ -20,7 +20,7 @@
             </select>
         </div>
         <ion-list>
-            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp" class="item item-avatar" href="/#/job/{{job.id}}-{{user.id}}">
+            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp" class="item item-avatar" href="/#/{{user.name}}/jobs/{{job.id}}">
                 <img class="front" src="/img/jobs/{{job.id}}/front.jpg" alt="front" title="front" />
                 <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
                 <h2>Job Name: {{job.name}}</h2>

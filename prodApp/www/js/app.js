@@ -33,32 +33,26 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       controller: 'LoginCtrl'
     })
 
-    .state('manager', {
-      url: "/",
-      templateUrl: "templates/splash.html",
-      abstract: true
-    })
-
-    .state('user', {
-      url: "/user",
-      templateUrl: "templates/navview.html",
-      abstract: true
-    })
+    // .state('user', {
+    //   url: "/:username",
+    //   templateUrl: "templates/navview.html",
+    //   abstract: true
+    // })
 
     .state('overview', {
-      url: '/user/:userId',
+      url: '/:username/jobs',
       templateUrl: "templates/overview.html", 
       controller: 'OverviewCtrl'
     })
 
-    .state('job', {
-      url: "/job",
-      templateUrl: "templates/navview.html",
-      abstract: true
-    })
+    // .state('job', {
+    //   url: "/job",
+    //   templateUrl: "templates/navview.html",
+    //   abstract: true
+    // })
 
     .state('jobview', {
-      url: '/job/:jobId-:userId',
+      url: '/:username/jobs/:jobId',
       templateUrl: "templates/jobview.html", 
       controller: 'JobviewCtrl'
     });
@@ -72,11 +66,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/login');
 
 
-  //   $urlRouterProvider.otherwise(
-  //     function(){
-  //       if($cookieStore)
-  //     }
-  //   );
+    // $urlRouterProvider.otherwise(
+      // function(){
+      //   if(
+      //     $cookieStore.get("username") != undefined &&
+      //     $cookieStore.get("password") != undefined &&
+      //     $cookieStore.get("roleid") != undefined &&
+      //     $cookieStore.get("authenticated") == "true"
+      //   ){
+      //     return ('/' + $cookieStore.get("username") + '/jobs');
+      //   }
+      //   else{
+      //     return "/login";
+      //   }
+      // }
+    // );
   // if($cookieStore.get(username))
   //   $location.path('/user/' + user.id);
 

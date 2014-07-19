@@ -8,13 +8,19 @@ angular.module('starter.controllers', ['ngCookies'])
 		$cookieStore.get("roleid") != undefined &&
 		$cookieStore.get("authenticated") == "true"
 	){
-		$location.path('/user/0');
+		$location.path('/' + $cookieStore.get("username") + '/jobs');
 	}
 
 	cssInjector.removeAll();
 	cssInjector.add('/css/login.css');    
 	$scope.logindata = {};
 
+	if($cookieStore.get("username") != undefined)
+		$scope.logindata.username = $cookieStore.get("username");
+	if($cookieStore.get("password") != undefined)
+		$scope.logindata.password = $cookieStore.get("password");
+	if($cookieStore.get("roleid") != undefined)
+		$scope.logindata.roleid = $cookieStore.get("roleid");
 
 
 
@@ -34,7 +40,7 @@ angular.module('starter.controllers', ['ngCookies'])
 			$cookieStore.put("roleid", roleid);
 			$cookieStore.put("authenticated", "true");
 
-			$location.path('/user/' + user.id);
+			$location.path('/' + username + '/jobs');
 		}
 		else
 			$scope.logindata.alert = "Error: Incorrect Authentication Information";
@@ -44,16 +50,16 @@ angular.module('starter.controllers', ['ngCookies'])
 .controller('OverviewCtrl', function($scope, $stateParams, cssInjector, User, Jobs){
 	cssInjector.removeAll();
 	cssInjector.add('/css/overview.css');
-	$scope.user = User.get($stateParams.userId);
+	$scope.user = User.getUserByName($stateParams.username);
 	$scope.jobs = Jobs.all();
 	$scope.orderProp = '';
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, cssInjector, User, Jobs){
+.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs){
 	cssInjector.removeAll();
 	cssInjector.add('/css/jobview.css');
 	var job = Jobs.get($stateParams.jobId);
-	var user = User.get($stateParams.userId);
+	var user = User.getUserByName($cookieStore.get("username"));
 	$scope.user = user;
 	$scope.job = job;
 	$scope.previews = job.print_location;

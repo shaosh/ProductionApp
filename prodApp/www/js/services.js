@@ -1,14 +1,14 @@
 angular.module('starter.services', [])
 .factory('User', function(){
 	var users = [
-		{id: 0, name: "Tim Duncan", role: ROLES[0]},
-		{id: 1, name: "Manu Ginobili", role: ROLES[1]},
-		{id: 2, name: "Tony Parker", role: ROLES[2]},
-		{id: 3, name: "Gregg Popovich", role: ROLES[3]},
-		{id: 4, name: "Tiago Splitter", role: ROLES[0]},
-		{id: 5, name: "Boris Diaw", role: ROLES[1]},
-		{id: 6, name: "Patrick Mills", role: ROLES[2]},
-		{id: 7, name: "RC Buford", role: ROLES[3]},
+		{id: 0, name: "TimDuncan", role: ROLES[0]},
+		{id: 1, name: "ManuGinobili", role: ROLES[1]},
+		{id: 2, name: "TonyParker", role: ROLES[2]},
+		{id: 3, name: "GreggPopovich", role: ROLES[3]},
+		{id: 4, name: "TiagoSplitter", role: ROLES[0]},
+		{id: 5, name: "BorisDiaw", role: ROLES[1]},
+		{id: 6, name: "PatrickMills", role: ROLES[2]},
+		{id: 7, name: "RCBuford", role: ROLES[3]},
 	];
 
 	return{
