@@ -1,0 +1,204 @@
+[
+	{
+		"id": 0,
+		"facilityid": 0,
+		"name": "Tim",
+		"roleid": 0
+	},
+	{
+		"id": 1,
+		"facilityid": 0,
+		"name": "Duncan",
+		"roleid": 0
+	},
+	{
+		"id": 2,
+		"facilityid": 0,
+		"name": "Tony",
+		"roleid": 1
+	},
+	{
+		"id": 3,
+		"facilityid": 0,
+		"name": "Parker",
+		"roleid": 1
+	},
+	{
+		"id": 4,
+		"facilityid": 0,
+		"name": "Manu",
+		"roleid": 2
+	},
+	{
+		"id": 5,
+		"facilityid": 0,
+		"name": "Ginobili",
+		"roleid": 2
+	},
+	{
+		"id": 6,
+		"facilityid": 0,
+		"name": "Tiago",
+		"roleid": 3
+	},
+	{
+		"id": 7,
+		"facilityid": 0,
+		"name": "Splitter",
+		"roleid": 3
+	},
+
+
+
+	{
+		"id": 10,
+		"facilityid": 1,
+		"name": "Danny",
+		"roleid": 0
+	},
+	{
+		"id": 11,
+		"facilityid": 1,
+		"name": "Green",
+		"roleid": 0
+	},
+	{
+		"id": 12,
+		"facilityid": 1,
+		"name": "Kawhi",
+		"roleid": 1
+	},
+	{
+		"id": 13,
+		"facilityid": 1,
+		"name": "Leonard",
+		"roleid": 1
+	},
+	{
+		"id": 14,
+		"facilityid": 1,
+		"name": "Patrick",
+		"roleid": 2
+	},
+	{
+		"id": 15,
+		"facilityid": 1,
+		"name": "Mills",
+		"roleid": 2
+	},
+	{
+		"id": 16,
+		"facilityid": 1,
+		"name": "Marco",
+		"roleid": 3
+	},
+	{
+		"id": 17,
+		"facilityid": 1,
+		"name": "Belinelli",
+		"roleid": 3
+	},
+
+
+
+	{
+		"id": 20,
+		"facilityid": 2,
+		"name": "Aron",
+		"roleid": 0
+	},
+	{
+		"id": 21,
+		"facilityid": 2,
+		"name": "Baynes",
+		"roleid": 0
+	},
+	{
+		"id": 22,
+		"facilityid": 2,
+		"name": "Cory",
+		"roleid": 1
+	},
+	{
+		"id": 23,
+		"facilityid": 2,
+		"name": "Joseph",
+		"roleid": 1
+	},
+	{
+		"id": 24,
+		"facilityid": 2,
+		"name": "Matt",
+		"roleid": 2
+	},
+	{
+		"id": 25,
+		"facilityid": 2,
+		"name": "Bonner",
+		"roleid": 2
+	},
+	{
+		"id": 26,
+		"facilityid": 2,
+		"name": "Nando",
+		"roleid": 3
+	},
+	{
+		"id": 27,
+		"facilityid": 2,
+		"name": "De Colo",
+		"roleid": 3
+	},
+
+
+
+	{
+		"id": 30,
+		"facilityid": 3,
+		"name": "Gary",
+		"roleid": 0
+	},
+	{
+		"id": 31,
+		"facilityid": 3,
+		"name": "Neal",
+		"roleid": 0
+	},
+	{
+		"id": 32,
+		"facilityid": 3,
+		"name": "RC",
+		"roleid": 1
+	},
+	{
+		"id": 33,
+		"facilityid": 3,
+		"name": "Buford",
+		"roleid": 1
+	},
+	{
+		"id": 34,
+		"facilityid": 3,
+		"name": "Brett",
+		"roleid": 2
+	},
+	{
+		"id": 35,
+		"facilityid": 3,
+		"name": "Brown",
+		"roleid": 2
+	},
+	{
+		"id": 36,
+		"facilityid": 3,
+		"name": "Gregg",
+		"roleid": 3
+	},
+	{
+		"id": 37,
+		"facilityid": 3,
+		"name": "Popovich",
+		"roleid": 3
+	}
+
+]

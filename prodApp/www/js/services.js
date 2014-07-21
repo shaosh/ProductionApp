@@ -49,7 +49,7 @@ angular.module('starter.services', [])
 		{id: 554803, name: "testingdevtest"},
 		{id: 554804, name: "flagtest"},
 		{id: 554810, name: "254"},
-		{id: 554814, name: "vidhyachrometest"},
+		{id: 554814, name: "vidhyachrometest"}
 	];
 
 	return{
@@ -79,6 +79,65 @@ angular.module('starter.services', [])
 			$location.path('/' + $cookieStore.get('username') + '/jobs');
 		}
 	}	
+})
+
+.factory('Api', function($http)){
+	return{
+		getStaffByFacility: function(facilityid){
+			var url = 'data/staffs.json';
+			$http.get(url).success(function(data){
+				var result = [];
+				for(var i = 0; i < data.length; i++){
+					if(data[i].facilityid == facilityid){
+						result.push(data[i]);
+					}
+				}
+				return result;
+			});
+		}, 
+		getStaffById: function(id){
+			var url = 'data/staffs.json';
+			$http.get(url).success(function(data){
+				var result = [];
+				for(var i = 0; i < data.length; i++){
+					if(data[i].id == id){
+						result.push(data[i]);
+					}
+				}
+				return result;
+			});
+		}, 
+		getStaffByJob: function(jobid){
+			var url = 'data/jobs.json';
+			$http.get(url).success(function(data){
+				for(var i = 0; i < data.length; i++){
+					if(data[i].id == jobid){
+						return data[i].staff;
+					}
+				}
+				return null;
+			});
+		}, 
+		getJobByFacility: function(facilityid){
+			var url = 'data/jobs.json';
+			$http.get(url).success(function(data){
+				var result = [];
+				for(var i = 0; i < data.length; i++){
+					if(data[i].facilityid == facilityid){
+						result.push(data[i]);
+					}
+				}
+				return result;
+			});
+		},
+
+		getRoles: function(){
+			var url = 'data/roles.json';
+			$http.get(url).success(function(data){
+				return data;
+			});
+		}
+	}
 });
 
 // .factory('Previews', function() {

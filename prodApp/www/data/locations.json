@@ -1,0 +1,46 @@
+[
+	{
+		"id": 0,
+		"name": "Front"
+	},
+	{
+		"id": 1,
+		"name": "Back"
+	},
+	{
+		"id": 2,
+		"name": "Right Sleeve"
+	},
+	{
+		"id": 3,
+		"name": "Left Sleeve"
+	},
+	{
+		"id": 4,
+		"name": "Nape"
+	},
+	{
+		"id": 5,
+		"name": "Right Side"
+	},
+	{
+		"id": 6,
+		"name": "Left Side"
+	},
+	{
+		"id": 7,
+		"name": "Other 1"
+	},
+	{
+		"id": 8,
+		"name": "Other 2"
+	},
+	{
+		"id": 9,
+		"name": "Other 3"
+	},
+	{
+		"id": 10,
+		"name": "Names & Numbers"
+	}
+]
