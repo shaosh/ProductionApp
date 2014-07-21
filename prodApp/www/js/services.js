@@ -130,6 +130,33 @@ angular.module('starter.services', [])
 				return result;
 			});
 		},
+		getJobByStaff: function(staffid){
+			var url = 'data/jobs.json';
+			$http.get(url).success(function(data){
+				var result = [];
+				for(var i = 0; i < data.length; i++){
+					for(var j = 0; j < data[i].staff.length; j++){
+						if(data[i].staff[j].staffid == staffid){
+							result.push(data[i].staff[j]);
+							break;
+						}
+					}
+				}
+				return result;
+			});
+		},
+		getJobById: function(jobid){
+			var url = 'data/jobs.json';
+			$http.get(url).success(function(data){
+				var result = [];
+				for(var i = 0; i < data.length; i++){
+					if(data[i].id == jobid){
+						return data[i];
+					}
+				}
+				return null;
+			});
+		},
 
 		getRoles: function(){
 			var url = 'data/roles.json';
