@@ -81,7 +81,7 @@ angular.module('starter.services', [])
 	}	
 })
 
-.factory('Api', function($http)){
+.factory('Api', function($http){
 	return{
 		getStaffByFacility: function(facilityid){
 			var url = 'data/staffs.json';
@@ -106,6 +106,48 @@ angular.module('starter.services', [])
 				}
 				return result;
 			});
+		}, 
+		// getAllStaff: function(){
+		// 	var url = 'data/staffs.json';
+		// 	return $http.get(url).success(function(data){return data;});
+		// },
+		getStaffByName: function(name){
+			var data = getAllStaff();
+			alert(data);
+			// var url = 'data/staffs.json';
+			// var promise = $http.get(url).success(function(data){
+			// 	alert("D: " + data);
+			// 	return data;
+			// });
+			// return promise;
+			// alert(promise);
+			// var result = 1;
+			// alert(promise.data);
+			// for(var i = 0; i < promise.length; i++){
+			// 	if(promise[i].name == name){
+			// 		 result = promise[i];
+			// 	}
+			// }
+			// alert("a: " + result);
+			// return result;
+			// return function(promise){
+			// 	for(var i = 0; i < data.length; i++){
+			// 		if(data[i].name == name){
+			// 			return data[i];
+			// 		}
+			// 	}
+			// };
+			// .success(function(data){
+			// 	for(var i = 0; i < data.length; i++){
+			// 		if(data[i].name == name){
+			// 			return data[i];
+			// 		}
+			// 	}
+			// });
+			// return promise;
+			// alert("result " + result);
+			// alert("Promise: " + result);
+			// return promise;
 		}, 
 		getStaffByJob: function(jobid){
 			var url = 'data/jobs.json';
@@ -132,7 +174,7 @@ angular.module('starter.services', [])
 		},
 		getJobByStaff: function(staffid){
 			var url = 'data/jobs.json';
-			$http.get(url).success(function(data){
+			var promise = $http.get(url).success(function(data){
 				var result = [];
 				for(var i = 0; i < data.length; i++){
 					for(var j = 0; j < data[i].staff.length; j++){
@@ -144,6 +186,7 @@ angular.module('starter.services', [])
 				}
 				return result;
 			});
+			return promise;
 		},
 		getJobById: function(jobid){
 			var url = 'data/jobs.json';
@@ -160,9 +203,10 @@ angular.module('starter.services', [])
 
 		getRoles: function(){
 			var url = 'data/roles.json';
-			$http.get(url).success(function(data){
+			var promise = $http.get(url).success(function(data){
 				return data;
 			});
+			return promise;
 		}
 	}
 });

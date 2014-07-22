@@ -1,7 +1,7 @@
 
 angular.module('starter.controllers', ['ngCookies'])
 
-.controller('LoginCtrl', function($scope, $location, $cookieStore, cssInjector, User){
+.controller('LoginCtrl', function($scope, $location, $cookieStore, $http, cssInjector, User, Api){
 	if(
 		$cookieStore.get("username") != undefined &&
 		$cookieStore.get("password") != undefined &&
@@ -14,6 +14,7 @@ angular.module('starter.controllers', ['ngCookies'])
 	cssInjector.removeAll();
 	cssInjector.add('/css/login.css');    
 	$scope.logindata = {};
+	
 
 	if($cookieStore.get("username") != undefined)
 		$scope.logindata.username = $cookieStore.get("username");
@@ -22,7 +23,9 @@ angular.module('starter.controllers', ['ngCookies'])
 	if($cookieStore.get("roleid") != undefined)
 		$scope.logindata.roleid = $cookieStore.get("roleid");
 
-
+	Api.getRoles().then(function(response){
+		$scope.roles = response.data;
+	});
 
 	$scope.login = function(){
 		var username = $scope.logindata.username;
@@ -34,10 +37,20 @@ angular.module('starter.controllers', ['ngCookies'])
 			return;
 		}
 		var user = User.getUserByName(username);
+
+		// var user = null;
+		// var result;
+		// Api.getAllStaff().then(function(data, result){alert(data.data.length);result = data.data.length};);
+		// alert(result);
+		// Api.getStaffByName(username);
+		// .then(function(response){
+		// 	$scope.user = response.data;
+		// });
+
 		if(user != null){
 			$cookieStore.put("username", username);
 			$cookieStore.put("password", password);
-			$cookieStore.put("roleid", roleid);
+			$cookieStore.put("roleid", user.role);
 			$cookieStore.put("authenticated", "true");
 
 			$location.path('/' + username + '/jobs');
@@ -45,13 +58,33 @@ angular.module('starter.controllers', ['ngCookies'])
 		else
 			$scope.logindata.alert = "Error: Incorrect Authentication Information";
 	};
+
+	$scope.clearCookies = function(){
+		$cookieStore.remove("username");
+		$cookieStore.remove("password");
+		$cookieStore.remove("roleid");
+		$cookieStore.remove("authenticated");
+		$scope.logindata.username = $cookieStore.get("");
+		$scope.logindata.password = $cookieStore.get("");
+		$scope.logindata.roleid = $cookieStore.get("");
+	}
 })
 
-.controller('OverviewCtrl', function($scope, $stateParams, cssInjector, User, Jobs, Account){
+.controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/overview.css');
-	$scope.user = User.getUserByName($stateParams.username);
-	$scope.jobs = Jobs.all();
+
+	Api.getStaffByName($stateParams.username).then(function(response){
+		$scope.user = response.data;
+	});
+
+	Api.getJobByStaff($scope.user.id).then(function(response){
+		$scope.jobs = response.data;
+	});
+
+	// $scope.user = User.getUserByName($stateParams.username);
+	// Api.getJobByStaff()
+	// $scope.jobs = Jobs.all();
 	$scope.orderProp = '';
 
 	$scope.$logoff = Account;

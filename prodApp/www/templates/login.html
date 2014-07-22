@@ -1,7 +1,7 @@
 <ion-view title="DAS Production App">
 	<ion-content>
 		<div class="list list-inset">
-            <p class="assertive">{{logindata.alert}}&nbsp;</p>
+            <p class="assertive">{{logindata.alert}}</p>
 		  	<label class="item item-input">
 		    	<input type="text" placeholder="User Name" ng-model="logindata.username" required>
 		  	</label>
@@ -9,17 +9,21 @@
 		    	<input type="password" placeholder="Password" ng-model="logindata.password" required>
 		  	</label>
             <label class="item item-input">
-                <select ng-model="logindata.roleid" required>
+                <select ng-model="logindata.roleid"  required>
                     <option value="" disabled selected>--Role--</option>
-                    <option value="0">Prep</option>
+                    <option ng-repeat="role in roles" value="{{role.id}}">{{role.name}}</option>
+                    <!-- <option value="0">Prep</option>
                     <option value="1">Printer</option>
                     <option value="2">QC</option>
-                    <option value="3">Manager</option>
+                    <option value="3">Manager</option> -->
                 </select>
             </label>
 		  	<button class="button button-block button-positive" ng-click="login()">
 			  	Sign In
 			</button>
+            <button class="button button-block button-positive" ng-click="clearCookies()">
+                Clear Cookies
+            </button>
 		</div>    
 	</ion-content>
 </ion-view>
