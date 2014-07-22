@@ -48,23 +48,23 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 		// var user = Api.getStaffByName(username);
 		// alert("username: " + user.name);
 
-		var User = Api.getStaffByName(username);
-		alert(User.name);
+		var user = Api.getStaffByName(username);
+		// alert(user.name);
 
-		Api.getStaffByName(username).then(function(response){
-			if(response.name != undefined){
-				$cookieStore.put("username", username);
-				$cookieStore.put("userid", response.id);
-				$cookieStore.put("password", password);
-				$cookieStore.put("facilityid", response.facility_id);
-				$cookieStore.put("roleid", response.role_id);
-				$cookieStore.put("rolename", rolename);
-				$cookieStore.put("authenticated", "true");
-				$location.path('/' + username + '/jobs');
-			}
-			else
-				$scope.logindata.alert = "Error: Incorrect Authentication Information";
-		});
+		// Api.getStaffByName(username).then(function(response){
+		// 	if(response.name != undefined){
+		// 		$cookieStore.put("username", username);
+		// 		$cookieStore.put("userid", response.id);
+		// 		$cookieStore.put("password", password);
+		// 		$cookieStore.put("facilityid", response.facility_id);
+		// 		$cookieStore.put("roleid", response.role_id);
+		// 		$cookieStore.put("rolename", rolename);
+		// 		$cookieStore.put("authenticated", "true");
+		// 		$location.path('/' + username + '/jobs');
+		// 	}
+		// 	else
+		// 		$scope.logindata.alert = "Error: Incorrect Authentication Information";
+		// });
 
 		
 

@@ -109,11 +109,25 @@ angular.module('starter.services', [])
 		}, 
 
 		//getStaffByName $resource version
-		getStaffByName: function(name){
+		getStaffByName: function(username){
 			var url = 'data/staffs.json';
+			alert(url);
 			var users = $resource(url);
-			alert(JSONStringify(users.get({name: '@name'}));
-			return users.get({name: name});
+			// users.query(function(response){
+			// 		angular.forEach(response, function(item){
+			// 			alert(item.name);
+			// 		});
+			// 	}
+			// );
+
+			users.get({name: username}, function(data){
+				alert(data.id);
+			}, function(response){alert(123)});
+			// user.$promise.then(function(data){alert(data.name);});
+			// user = users.get({name: name}, function(){});
+			// alert("ID: " + user.id);
+			// alert(users.get({name: name}));
+			return user;
 		},
 
 		//getStaffByName $http version
