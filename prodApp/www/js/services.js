@@ -81,7 +81,7 @@ angular.module('starter.services', [])
 	}	
 })
 
-.factory('Api', function($http){
+.factory('Api', function($http, $resource){
 	return{
 		getStaffByFacility: function(facilityid){
 			var url = 'data/staffs.json';
@@ -107,48 +107,32 @@ angular.module('starter.services', [])
 				return result;
 			});
 		}, 
-		// getAllStaff: function(){
-		// 	var url = 'data/staffs.json';
-		// 	return $http.get(url).success(function(data){return data;});
-		// },
+
+		//getStaffByName $resource version
 		getStaffByName: function(name){
-			var data = getAllStaff();
-			alert(data);
-			// var url = 'data/staffs.json';
-			// var promise = $http.get(url).success(function(data){
-			// 	alert("D: " + data);
-			// 	return data;
-			// });
-			// return promise;
-			// alert(promise);
-			// var result = 1;
-			// alert(promise.data);
-			// for(var i = 0; i < promise.length; i++){
-			// 	if(promise[i].name == name){
-			// 		 result = promise[i];
-			// 	}
-			// }
-			// alert("a: " + result);
-			// return result;
-			// return function(promise){
-			// 	for(var i = 0; i < data.length; i++){
-			// 		if(data[i].name == name){
-			// 			return data[i];
-			// 		}
-			// 	}
-			// };
-			// .success(function(data){
-			// 	for(var i = 0; i < data.length; i++){
-			// 		if(data[i].name == name){
-			// 			return data[i];
-			// 		}
-			// 	}
-			// });
-			// return promise;
-			// alert("result " + result);
-			// alert("Promise: " + result);
-			// return promise;
-		}, 
+			var url = 'data/staffs.json';
+			var users = $resource(url);
+			alert(JSONStringify(users.get({name: '@name'}));
+			return users.get({name: name});
+		},
+
+		//getStaffByName $http version
+		// getStaffByName: function(name){
+		// 	var func = function(){
+		// 		var url = 'data/staffs.json';
+		// 		var promise = $http.get(url);
+		// 		return promise;
+		// 	};
+		// 	return func().then(function(response){
+		// 		for(var i = 0; i < response.data.length; i++){
+		// 			if(response.data[i].name == name){
+		// 				return response.data[i];
+		// 			}
+		// 		}
+		// 	});
+		// }, 
+
+		
 		getStaffByJob: function(jobid){
 			var url = 'data/jobs.json';
 			$http.get(url).success(function(data){
@@ -201,12 +185,23 @@ angular.module('starter.services', [])
 			});
 		},
 
+		//getRoles $http version
+		// getRoles: function(){
+		// 	var url = 'data/roles.json';
+		// 	var promise = $http.get(url).success(function(data){
+		// 		return data;
+		// 	});
+		// 	return promise;
+		// }
+
+		//getRoles $resource version
 		getRoles: function(){
 			var url = 'data/roles.json';
-			var promise = $http.get(url).success(function(data){
-				return data;
-			});
-			return promise;
+			return $resource(url);
+			// var promise = $http.get(url).success(function(data){
+			// 	return data;
+			// });
+			// return promise;
 		}
 	}
 });
