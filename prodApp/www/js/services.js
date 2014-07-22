@@ -109,25 +109,30 @@ angular.module('starter.services', [])
 		}, 
 
 		//getStaffByName $resource version
-		getStaffByName: function(username){
+		getStaffs: function(){
 			var url = 'data/staffs.json';
-			alert(url);
-			var users = $resource(url);
-			// users.query(function(response){
-			// 		angular.forEach(response, function(item){
-			// 			alert(item.name);
-			// 		});
-			// 	}
-			// );
+			return $resource(url);
+		},
 
-			users.get({name: username}, function(data){
-				alert(data.id);
-			}, function(response){alert(123)});
-			// user.$promise.then(function(data){alert(data.name);});
-			// user = users.get({name: name}, function(){});
-			// alert("ID: " + user.id);
-			// alert(users.get({name: name}));
-			return user;
+
+		getStaffByName: function(username, users){
+			for(var i = 0; i < users.length; i++){
+				if(users[i].name == username)
+					return users[i];
+			}
+			return null;
+			// var url = 'data/staffs.json';
+			// var users = $resource(url);
+			// func = users.query(function(){
+			// 	alert("func: " + func);
+			// 	for(var i = 0; i < func.length; i++){
+			// 		if(func[i].name == username){
+			// 			func = func[i];
+			// 			break;
+			// 		}
+			// 	}
+			// 	alert("new func: " + func.name);
+			// });
 		},
 
 		//getStaffByName $http version

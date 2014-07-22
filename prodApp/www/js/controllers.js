@@ -3,12 +3,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 
 .controller('LoginCtrl', function($scope, $location, $cookieStore, cssInjector, User, Api){
 	if(
-		$cookieStore.get("username") != undefined &&
+		// $cookieStore.get("username") != undefined &&
+		$cookieStore.get("user") != undefined &&
 		$cookieStore.get("password") != undefined &&
-		$cookieStore.get("roleid") != undefined &&
+		// $cookieStore.get("roleid") != undefined &&
 		$cookieStore.get("authenticated") == "true"
 	){
-		$location.path('/' + $cookieStore.get("username") + '/jobs');
+		$location.path('/' + $cookieStore.get("user").name + '/jobs');
 	}
 
 	cssInjector.removeAll();
@@ -16,18 +17,24 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	$scope.logindata = {};
 	
 
-	if($cookieStore.get("username") != undefined)
-		$scope.logindata.username = $cookieStore.get("username");
+	// if($cookieStore.get("username") != undefined)
+	// 	$scope.logindata.username = $cookieStore.get("username");
+	if($cookieStore.get("user") != undefined){
+		$scope.logindata.username = $cookieStore.get("user").name;
+		$scope.logindata.roleid = $cookieStore.get("user").role_id;
+	}
+		
 	if($cookieStore.get("password") != undefined)
 		$scope.logindata.password = $cookieStore.get("password");
-	if($cookieStore.get("roleid") != undefined)
-		$scope.logindata.roleid = $cookieStore.get("roleid");
+	// if($cookieStore.get("roleid") != undefined)
+	// 	$scope.logindata.roleid = $cookieStore.get("roleid");
 
-	$scope.roles = Api.getRoles().query(function(response){
-			angular.forEach(response, function(item){
-			});
-		}
-	);
+	$scope.roles = Api.getRoles().query();
+		// function(response){
+		// 	angular.forEach(response, function(item){
+		// 	});
+		// }
+	// );
 
 	// $scope.roles = Api.getRoles();
 	// Api.getRoles().then(function(response){
@@ -38,18 +45,31 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 		var username = $scope.logindata.username;
 		var password = $scope.logindata.password;
 		var roleid = $scope.logindata.roleid;
-		var rolename = $scope.logindata.rolename;
+		var rolename = $scope.roles[roleid].name;//$scope.logindata.rolename;
 		if(username == undefined || password == undefined || roleid == undefined){
 			$scope.logindata.alert = "Error: Incomplete Authentication Information";
-			$scope.logindata.username ;
 			return;
 		}
-		// var user = User.getUserByName(username);
-		// var user = Api.getStaffByName(username);
-		// alert("username: " + user.name);
 
-		var user = Api.getStaffByName(username);
-		// alert(user.name);
+		var users = Api.getStaffs().query(function(){
+				var user = Api.getStaffByName(username, users);
+				if(user != null){
+					// alert(user);
+					// $cookieStore.put("username", username);
+					// $cookieStore.put("userid", user.id);
+					$cookieStore.put("user", user);
+					$cookieStore.put("password", password);
+					// $cookieStore.put("facilityid", user.facility_id);
+					// $cookieStore.put("roleid", user.role_id);
+					$cookieStore.put("rolename", rolename);
+					$cookieStore.put("authenticated", "true");
+					$location.path('/' + username + '/jobs');
+				}
+				else
+					$scope.logindata.alert = "Error: Incorrect Authentication Information";
+			}
+		);
+		
 
 		// Api.getStaffByName(username).then(function(response){
 		// 	if(response.name != undefined){
@@ -81,13 +101,14 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	};
 
 	$scope.clearCookies = function(){
-		$cookieStore.remove("username");
+		// $cookieStore.remove("username");
+		$cookieStore.remove("user");
 		$cookieStore.remove("password");
-		$cookieStore.remove("roleid");
+		// $cookieStore.remove("roleid");
 		$cookieStore.remove("authenticated");
 
-		$cookieStore.remove("userid");
-		$cookieStore.remove("facilityid");
+		// $cookieStore.remove("userid");
+		// $cookieStore.remove("facilityid");
 		$cookieStore.remove("rolename");
 
 		$scope.logindata.username = $cookieStore.get("");
@@ -105,24 +126,33 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	// $cookieStore.remove("roleid");
 	// $cookieStore.remove("authenticated");
 
-	Api.getStaffByName($stateParams.username).then(function(response){
-		alert(response.id);
-		$scope.user = response;
-
-		Api.getJobByStaff($scope.user.id).then(function(response){
-			$scope.jobs = response.data;
-		});
-
-		// $scope.user = User.getUserByName($stateParams.username);
-		// Api.getJobByStaff()
-		// $scope.jobs = Jobs.all();
-		$scope.orderProp = '';
-
-		$scope.$logoff = Account;
-
-		//function to go to overview page
-		$scope.$overview = Account;
+	$scope.user = $cookieStore.get("user");
+	$scope.rolename = $cookieStore.get("rolename");
+	$scope.orderProp = '';
+	$scope.$logoff = Account;
+	$scope.$overview = Account;
+	Api.getJobByStaff($scope.user.id).then(function(response){
+		$scope.jobs = response.data;
 	});
+
+	// Api.getStaffByName($stateParams.username).then(function(response){
+	// 	alert(response.id);
+	// 	$scope.user = response;
+
+	// 	Api.getJobByStaff($scope.user.id).then(function(response){
+	// 		$scope.jobs = response.data;
+	// 	});
+
+	// 	// $scope.user = User.getUserByName($stateParams.username);
+	// 	// Api.getJobByStaff()
+	// 	// $scope.jobs = Jobs.all();
+	// 	$scope.orderProp = '';
+
+	// 	$scope.$logoff = Account;
+
+	// 	//function to go to overview page
+	// 	$scope.$overview = Account;
+	// });
 
 	// Api.getJobByStaff($scope.user.id).then(function(response){
 	// 	$scope.jobs = response.data;
