@@ -177,7 +177,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	// $scope.orderProp = '';
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs, Account, Api){
+.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/jobview.css');
 	// var job = Jobs.get($stateParams.jobId);
@@ -203,6 +203,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 		$scope.job = job;
 		$scope.previews = job.location;
 
+
 		if($scope.rolename != roles[3].name){
 			$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
 		}
@@ -211,9 +212,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 				$scope.preps = [];
 				$scope.printers = [];
 				angular.forEach(data, function(staff){
-					if(staff.role_id = roles[0].id)
+					if(staff.role_id == roles[0].id && Helpers.selectStaffByFacility(user, staff))
 						$scope.preps.push(staff);
-					else if(staff.role_id = roles[1].id)
+					else if(staff.role_id == roles[1].id && Helpers.selectStaffByFacility(user, staff))
 						$scope.printers.push(staff);
 				});
 			});
