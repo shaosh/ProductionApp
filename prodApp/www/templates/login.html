@@ -12,10 +12,6 @@
                 <select ng-model="logindata.roleid"  required>
                     <option value="" disabled selected>--Role--</option>
                     <option ng-repeat="role in roles" value="{{role.id}}">{{role.name}}</option>
-                    <!-- <option value="0">Prep</option>
-                    <option value="1">Printer</option>
-                    <option value="2">QC</option>
-                    <option value="3">Manager</option> -->
                 </select>
             </label>
 		  	<button class="button button-block button-positive" ng-click="login()">

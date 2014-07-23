@@ -69,20 +69,67 @@ angular.module('starter.services', [])
 })
 
 .factory('Account', function($location, $cookieStore){
+	var global = {};
 	return{
+		login: function(user, password, rolename){
+			$cookieStore.put("user", user);
+			$cookieStore.put("password", password);
+			$cookieStore.put("rolename", rolename);
+			$cookieStore.put("authenticated", "true");
+			// $cookieStore.put("roles", $scope.roles);
+			$location.path('/' + user.name + '/jobs');
+		},
+
 		logoff: function(){
 			$cookieStore.put("authenticated", "false");
+			global = {};
 			$location.path('/login');
 		},
 
-		overview: function(){
-			$location.path('/' + $cookieStore.get('username') + '/jobs');
-		}
+		overview: function(isOverview){
+			if(!isOverview)
+				$location.path('/' + $cookieStore.get('username') + '/jobs');
+		},
+
+		addGlobal: function(key, value){
+			global[key] = value;
+		}, 
+
+		getGlobal: function(key){
+			return global[key];
+		},
+
+		removeGlobal: function(key){
+			if(global[key] != undefined)
+				global[key] = undefined;
+		},
+
+		clearGlobal: function(){
+			global = {};
+		},
 	}	
 })
 
 .factory('Api', function($http, $resource){
 	return{
+		//Get All Kinds of Data
+		getData: function(datatype){
+			var url = "data/" + datatype + ".json";
+			return $resource(url, {}, {
+				query: {
+					method: "GET",
+					cache: true,
+					isArray: true
+				}
+			});
+		},
+
+		//Get Staff Functions
+		//Return all the data first, then select from it with other functions
+		getStaffs: function(){
+			var url = 'data/staffs.json';
+			return $resource(url);
+		},
 		getStaffByFacility: function(facilityid){
 			var url = 'data/staffs.json';
 			$http.get(url).success(function(data){
@@ -109,12 +156,6 @@ angular.module('starter.services', [])
 		}, 
 
 		//getStaffByName $resource version
-		getStaffs: function(){
-			var url = 'data/staffs.json';
-			return $resource(url);
-		},
-
-
 		getStaffByName: function(username, users){
 			for(var i = 0; i < users.length; i++){
 				if(users[i].name == username)
@@ -150,7 +191,6 @@ angular.module('starter.services', [])
 		// 		}
 		// 	});
 		// }, 
-
 		
 		getStaffByJob: function(jobid){
 			var url = 'data/jobs.json';
@@ -163,6 +203,13 @@ angular.module('starter.services', [])
 				return null;
 			});
 		}, 
+
+		//GetJob Functions
+		getJobs: function(){
+			var url = 'data/jobs.json';
+			return $resource(url);
+		},
+
 		getJobByFacility: function(facilityid){
 			var url = 'data/jobs.json';
 			$http.get(url).success(function(data){

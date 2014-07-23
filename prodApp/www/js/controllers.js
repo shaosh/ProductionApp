@@ -1,7 +1,7 @@
 
 angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 
-.controller('LoginCtrl', function($scope, $location, $cookieStore, cssInjector, User, Api){
+.controller('LoginCtrl', function($scope, $location, $cookieStore, cssInjector, User, Account, Api){
 	if(
 		// $cookieStore.get("username") != undefined &&
 		$cookieStore.get("user") != undefined &&
@@ -29,7 +29,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	// if($cookieStore.get("roleid") != undefined)
 	// 	$scope.logindata.roleid = $cookieStore.get("roleid");
 
-	$scope.roles = Api.getRoles().query();
+	// $scope.roles = Api.getRoles().query();
+	$scope.roles = Api.getData("roles").query();
+
 		// function(response){
 		// 	angular.forEach(response, function(item){
 		// 	});
@@ -51,22 +53,20 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 			return;
 		}
 
-		var users = Api.getStaffs().query(function(){
-				var user = Api.getStaffByName(username, users);
-				if(user != null){
-					// alert(user);
-					// $cookieStore.put("username", username);
-					// $cookieStore.put("userid", user.id);
-					$cookieStore.put("user", user);
-					$cookieStore.put("password", password);
-					// $cookieStore.put("facilityid", user.facility_id);
-					// $cookieStore.put("roleid", user.role_id);
-					$cookieStore.put("rolename", rolename);
-					$cookieStore.put("authenticated", "true");
-					$location.path('/' + username + '/jobs');
-				}
-				else
-					$scope.logindata.alert = "Error: Incorrect Authentication Information";
+		Api.getData("staffs").query(function(data){
+			var user = Api.getStaffByName(username, data);
+			if(user != null && roleid == user.role_id){
+				Account.login(user, password, rolename);
+				Account.addGlobal("roles", $scope.roles);
+				// $cookieStore.put("user", user);
+				// $cookieStore.put("password", password);
+				// $cookieStore.put("rolename", rolename);
+				// $cookieStore.put("authenticated", "true");
+				// $cookieStore.put("roles", $scope.roles);
+				// $location.path('/' + username + '/jobs');
+			}
+			else
+				$scope.logindata.alert = "Error: Incorrect Authentication Information";
 			}
 		);
 		
@@ -129,11 +129,24 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	$scope.user = $cookieStore.get("user");
 	$scope.rolename = $cookieStore.get("rolename");
 	$scope.orderProp = '';
+	$scope.isOverview = false;
 	$scope.$logoff = Account;
 	$scope.$overview = Account;
-	Api.getJobByStaff($scope.user.id).then(function(response){
-		$scope.jobs = response.data;
-	});
+
+	Api.getData("jobs").query(function(data){
+			$scope.jobs = [];
+			angular.forEach(data, function(job){
+				if($scope.user.facility_id.indexOf(job.facility_id) > -1){
+					$scope.jobs.push(job);
+				}
+			});
+		}
+	);
+
+	//$http version
+	// Api.getJobByStaff($scope.user.id).then(function(response){
+	// 	$scope.jobs = response.data;
+	// });
 
 	// Api.getStaffByName($stateParams.username).then(function(response){
 	// 	alert(response.id);
@@ -162,65 +175,138 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	// // Api.getJobByStaff()
 	// // $scope.jobs = Jobs.all();
 	// $scope.orderProp = '';
-
-	// $scope.$logoff = Account;
-
-	// //function to go to overview page
-	// $scope.$overview = Account;
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs, Account){
+.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/jobview.css');
-	var job = Jobs.get($stateParams.jobId);
-	var user = User.getUserByName($cookieStore.get("username"));
+	// var job = Jobs.get($stateParams.jobId);
+	var user = $cookieStore.get("user");
+	var roles = Account.getGlobal("roles");
 	$scope.user = user;
-	$scope.job = job;
-	$scope.previews = job.print_location;
-	if(user.role != "Manager"){
-		$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
-	}
-	else{
-		$scope.preps = User.getUsersByRole(ROLES[0]);
-		$scope.printers = User.getUsersByRole(ROLES[1]);
-		$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
-		$scope.assignee = {};
-		$scope.assign = function(){
-			if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
-				$scope.alert = "Incomplete Info";
-			}
-		}
-	}
-	if(user.role == "Printer"){
-		$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
-	}
-	
-	//Tag to mark if a location is being printing. If so, the user can't select other printer location.
-	$scope.processing = false;
-
-	//funciton to select printer location
-	$scope.selectedLocation = function(img, location){
-		if($scope.processing)
-			return;
-		$scope.selectedImg = img;
-		$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
-		$scope.largePreviewText = location + " is not included in the design";
-	}
-
-	//function to process a printer location, and other locations can't be selected.
-	$scope.movetoNext = function(){
-		$scope.processing = true;
-	}
-
-	$scope.printNN = function(){
-		$scope.processing = true;
-	}
-
+	$scope.rolename = $cookieStore.get("rolename");
+	$scope.isOverview = true;
 	//function to log off
 	$scope.$logoff = Account;	
-
 	//function to go to overview page
 	$scope.$overview = Account;
+
+	//Code which depends on the job variable
+	//Fetch the specific job based on its job id.
+	Api.getData("jobs").query(function(data){
+		for(var i = 0; i < data.length; i++){
+			if(data[i].id == $stateParams.jobId){
+				job = data[i];
+				break;
+			}
+		}
+		$scope.job = job;
+		$scope.previews = job.location;
+
+		if($scope.rolename != roles[3].name){
+			$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
+		}
+		else{
+			Api.getData("staffs").query(function(data){
+				$scope.preps = [];
+				$scope.printers = [];
+				angular.forEach(data, function(staff){
+					if(staff.role_id = roles[0].id)
+						$scope.preps.push(staff);
+					else if(staff.role_id = roles[1].id)
+						$scope.printers.push(staff);
+				});
+			});
+			$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
+			$scope.assignee = {};
+			$scope.assign = function(){
+				if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
+					$scope.alert = "Incomplete Assignment";
+				}
+			}
+		}
+		if(user.role_id == roles[1].id){
+			$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
+		}
+		
+		//Tag to mark if a location is being printing. If so, the user can't select other printer location.
+		$scope.processing = false;
+
+		//funciton to select printer location
+		$scope.selectedLocation = function(img, location){
+			if($scope.processing)
+				return;
+			$scope.selectedImg = img;
+			$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
+			$scope.largePreviewText = location + " is not included in the design";
+		}
+
+		//function to process a printer location, and other locations can't be selected.
+		$scope.movetoNext = function(){
+			$scope.processing = true;
+		}
+
+		$scope.printNN = function(){
+			$scope.processing = true;
+		}
+	});
+
+	//Code to execute after the job is fetched
+	// $scope.$watch('job', function(){
+	// 	var job = $scope.job;
+	// 	alert(job.name);
+	// 	alert(job.facility_id);
+	// 	$scope.alert = $scope.job.name;
+	// });
+	
+	// if($scope.rolename != roles[3].name){
+	// 	$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
+	// }
+	// else{
+	// 	Api.getData("staffs").query(function(data){
+	// 		$scope.preps = [];
+	// 		$scope.printers = [];
+	// 		angular.forEach(data, function(staff){
+	// 			if(staff.role_id = roles[0].id)
+	// 				$scope.preps.push(staff);
+	// 			else if(staff.role_id = roles[1].id)
+	// 				$scope.printers.push(staff);
+	// 		});
+	// 	});
+	// 	$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
+	// 	$scope.assignee = {};
+	// 	$scope.assign = function(){
+	// 		if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
+	// 			$scope.alert = "Incomplete Assignment";
+	// 		}
+	// 	}
+	// }
+	// if(user.role_id == roles[1].id){
+	// 	$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
+	// }
+	
+	// //Tag to mark if a location is being printing. If so, the user can't select other printer location.
+	// $scope.processing = false;
+
+	// //funciton to select printer location
+	// $scope.selectedLocation = function(img, location){
+	// 	if($scope.processing)
+	// 		return;
+	// 	$scope.selectedImg = img;
+	// 	$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
+	// 	$scope.largePreviewText = location + " is not included in the design";
+	// }
+
+	// //function to process a printer location, and other locations can't be selected.
+	// $scope.movetoNext = function(){
+	// 	$scope.processing = true;
+	// }
+
+	// $scope.printNN = function(){
+	// 	$scope.processing = true;
+	// }
+
+
 });
 
 var ROLES = ["Prep", "Printer", "QC", "Manager"];

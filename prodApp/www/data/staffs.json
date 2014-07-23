@@ -37,7 +37,7 @@
 	},
 	{
 		"id": 6,
-		"facility_id": [0],
+		"facility_id": [0, 1],
 		"name": "Tiago",
 		"role_id": 3
 	},

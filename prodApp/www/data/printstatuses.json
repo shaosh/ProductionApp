@@ -1,0 +1,47 @@
+[
+	{
+		"id": 0,
+		"name": "Print Location Started",
+		"availibility": 0
+	},
+	{
+		"id": 1,
+		"name": "Setup Complete / Proof to CSR",
+		"availibility": 0
+	},
+	{
+		"id": 2,
+		"name": "CSR Approved",
+		"availibility": 0
+	},
+	{
+		"id": 3,
+		"name": "Press Started",
+		"availibility": 0
+	},
+	{
+		"id": 4,
+		"name": "Print Location Complete",
+		"availibility": 0
+	},
+	{
+		"id": 5,
+		"name": "Print Location QC Complete",
+		"availibility": 0
+	},
+	{
+		"id": 6,
+		"name": "Names & Numbers Start",
+		"availibility": 1
+	},
+	{
+		"id": 7,
+		"name": "Names & Numbers Stop",
+		"availibility": 1
+	},
+	{
+		"id": 8,
+		"name": "Names & Numbers QC Complete",
+		"availibility": 1
+	}
+]
