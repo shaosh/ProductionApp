@@ -1,7 +1,7 @@
 
-angular.module('starter.controllers', ['ngCookies', 'ngResource'])
+angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageModule'])
 
-.controller('LoginCtrl', function($scope, $location, $cookieStore, cssInjector, User, Account, Api){
+.controller('LoginCtrl', function($scope, $location, $cookieStore, localStorageService, cssInjector, User, Account, Api){
 	if(
 		// $cookieStore.get("username") != undefined &&
 		$cookieStore.get("user") != undefined &&
@@ -57,7 +57,15 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 			var user = Api.getStaffByName(username, data);
 			if(user != null && roleid == user.role_id){
 				Account.login(user, password, rolename);
-				Account.addGlobal("roles", $scope.roles);
+
+				localStorageService.clearAll();
+				localStorageService.set("roles", $scope.roles);
+				var constants = ["locations", "facilities", "logstatuses", "printstatuses"];
+				angular.forEach(constants, function(constant){
+					Api.getData(constant).query(function(data){
+						localStorageService.set(constant, data);
+					});
+				});
 				// $cookieStore.put("user", user);
 				// $cookieStore.put("password", password);
 				// $cookieStore.put("rolename", rolename);
@@ -117,7 +125,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	}
 })
 
-.controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, User, Jobs, Account, Api){
+.controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/overview.css');
 
@@ -136,7 +144,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	Api.getData("jobs").query(function(data){
 			$scope.jobs = [];
 			angular.forEach(data, function(job){
-				if($scope.user.facility_id.indexOf(job.facility_id) > -1){
+				if(Helpers.facilityIdCompare($scope.user, job)){
 					$scope.jobs.push(job);
 				}
 			});
@@ -177,12 +185,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 	// $scope.orderProp = '';
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, Helpers, Account, Api){
+.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, localStorageService, cssInjector, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/jobview.css');
-	// var job = Jobs.get($stateParams.jobId);
-	var user = $cookieStore.get("user");
-	var roles = Account.getGlobal("roles");
+	var user = $cookieStore.get("user");	
+	var roles = localStorageService.get("roles");
+
 	$scope.user = user;
 	$scope.rolename = $cookieStore.get("rolename");
 	$scope.isOverview = true;
@@ -203,19 +211,28 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource'])
 		$scope.job = job;
 		$scope.previews = job.location;
 
-
 		if($scope.rolename != roles[3].name){
 			$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
 		}
 		else{
+			// alert(3);
 			Api.getData("staffs").query(function(data){
 				$scope.preps = [];
 				$scope.printers = [];
+				// alert(4);
 				angular.forEach(data, function(staff){
-					if(staff.role_id == roles[0].id && Helpers.selectStaffByFacility(user, staff))
+					// alert(5);
+					// alert(staff.role_id + ":" + roles[0].id);
+					// alert(Helpers.selectStaffByFacility(user, staff));
+					if(staff.role_id == roles[0].id && Helpers.facilityIdCompare(staff, job)){
+						// alert(staff.name);
 						$scope.preps.push(staff);
-					else if(staff.role_id == roles[1].id && Helpers.selectStaffByFacility(user, staff))
+					}
+					else if(staff.role_id == roles[1].id && Helpers.facilityIdCompare(staff, job)){
+						// alert(staff.name);
 						$scope.printers.push(staff);
+					}
+					// alert(6);
 				});
 			});
 			$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";

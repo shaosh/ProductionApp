@@ -69,7 +69,6 @@ angular.module('starter.services', [])
 })
 
 .factory('Account', function($location, $cookieStore){
-	var global = [];
 	return{
 		login: function(user, password, rolename){
 			$cookieStore.put("user", user);
@@ -82,41 +81,23 @@ angular.module('starter.services', [])
 
 		logoff: function(){
 			$cookieStore.put("authenticated", "false");
-			global = [];
+			global = {};
 			$location.path('/login');
 		},
 
 		overview: function(isOverview){
 			if(!isOverview)
 				$location.path('/' + $cookieStore.get('user').name + '/jobs');
-		},
-
-		addGlobal: function(key, value){
-			global[key] = value;
-		}, 
-
-		getGlobal: function(key){
-			return global[key];
-		},
-
-		removeGlobal: function(key){
-			if(global[key] != undefined)
-				global[key] = undefined;
-		},
-
-		clearGlobal: function(){
-			global = [];
-		},
+		}
 	}	
 })
 
 .factory('Helpers', function() {
 	return{
-		selectStaffByFacility: function(user, staff){
-			angular.forEach(staff.facility_id, function(id){
-				if(user.facility_id.indexOf(id) > -1)
-					return true;
-			});
+		facilityIdCompare: function(staff, job){
+			if(staff.facility_id.indexOf(job.facility_id) > -1){
+				return true;
+			}
 			return false;
 		}
 	}
