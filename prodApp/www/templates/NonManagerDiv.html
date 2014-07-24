@@ -1,3 +1,4 @@
-<button class="button button-positive" id="nextbtn" ng-click="movetoNext()">
-    Move to Next Status
+<button class="button" id="nextbtn" ng-click="movetoNext()"
+        ng-class="{'valid-next-status': validNextStatsus}">
+    Move to Next Status: {{nextStatusText}}
 </button>

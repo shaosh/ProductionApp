@@ -214,7 +214,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 		}
 		$scope.job = job;
-		$scope.previews = job.location;
+		$scope.previews = [];
+		angular.forEach(job.location, function(location){
+			$scope.previews.push({
+				"location": location, 
+				"name": Helpers.getObjectById(location.location_id, localStorageService.get("locations")).name.toLowerCase()
+			});
+		});
 		$scope.facility_name = Helpers.getObjectById(job.facility_id, localStorageService.get("facilities")).name;
 
 		$scope.joblogs = [];
@@ -248,36 +254,87 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		// $scope.joblogs = job.log;
 		$scope.orderProp = "id";
 
+		//Add the next status button for non-manager users
 		if($scope.rolename != roles[3].name){
 			$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
+			// $scope.validNextStatsus = true;
+			//function to process a printer location, and other locations can't be selected.
+			$scope.movetoNext = function(){
+				if(!$scope.validNextStatsus)
+					return;
+				$scope.processing = true;
+			};
 		}
+		//Add the assign job button for manager users
 		else{
 			$scope.preps = [];
 			$scope.printers = [];
-			Api.getData("staffs").query(function(data){				
-				angular.forEach(data, function(staff){
-					if(staff.role_id == roles[0].id && Helpers.facilityIdCompare(staff, job)){
-						$scope.preps.push(staff);
-					}
-					else if(staff.role_id == roles[1].id && Helpers.facilityIdCompare(staff, job)){
-						$scope.printers.push(staff);
-					}
+			var prep = Helpers.findAssignedStaff(roles[0].id, job.staff);
+			var printer = Helpers.findAssignedStaff(roles[1].id, job.staff);
+			//If this job is already assigned
+			if(prep != null && printer != null){
+				Api.getData("staffs").query(function(data){				
+					angular.forEach(data, function(staff){
+						if(staff.id == prep.staff_id){
+							$scope.prep = staff;
+						}
+						else if(staff.id == printer.staff_id){
+							$scope.printer = staff;
+						}
+					});
 				});
-			});
-			$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
-			$scope.assignee = {};
-			$scope.assign = function(){
-				if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
-					$scope.alert = "Incomplete Assignment";
-					return;
-				}
-				var staffs = [];
-				staffs.push(Helpers.getObjectById($scope.assignee.prep, $scope.preps));
-				staffs.push(Helpers.getObjectById($scope.assignee.printer, $scope.printers));
-				Api.assignStaffs(staffs, job.id);
-			};
+				$scope.ManagerDiv = "/templates/" + ASSIGNED_MANAGER_DIV + ".html";	
+				$scope.assign = function(){
+					$scope.alert = "This job has already been assigned";
+				};
+			}
+			//If this job has not been assigned
+			else{
+				Api.getData("staffs").query(function(data){				
+					angular.forEach(data, function(staff){
+						if(staff.role_id == roles[0].id && Helpers.facilityIdCompare(staff, job)){
+							$scope.preps.push(staff);
+						}
+						else if(staff.role_id == roles[1].id && Helpers.facilityIdCompare(staff, job)){
+							$scope.printers.push(staff);
+						}
+					});
+				});
+				
+				$scope.assignee = {};
+				$scope.assigned = true;
+				$scope.assign = function(){
+					if($scope.assigned){
+						if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
+							$scope.alert = "Incomplete Assignment";
+							return;
+						}
+						var staffs = [];
+						staffs.push(Helpers.getObjectById($scope.assignee.prep, $scope.preps));
+						staffs.push(Helpers.getObjectById($scope.assignee.printer, $scope.printers));
+						Api.assignStaffs(staffs, job.id);
+						
+						//Update the job log
+						var logstatuses = localStorageService.get("logstatuses");
+						var logname = logstatuses[1].name;
+						var logicon = "ion-checkmark";
+						$scope.joblogs.push({
+							"name": logname,
+							"icon": logicon
+						});
 
+						$scope.alert = "Job assigned";
+						$scope.assigned = false;
+					}
+					else{
+						$scope.alert = "This job has already been assigned";
+					}
+				};
+				$scope.ManagerDiv = "/templates/" + UNASSIGNED_MANAGER_DIV + ".html";
+			}			
 		}
+
+		//Add the print name and numbers button for printer users
 		if(user.role_id == roles[1].id){
 			$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
 		}
@@ -289,14 +346,36 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			if($scope.processing)
 				return;
 			$scope.selectedImg = img;
-			$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
-			$scope.largePreviewText = location + " is not included in the design";
+			$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location.name + ".jpg";
+			$scope.largePreviewText = location.name + " is not included in the design";
+			$scope.largePreviewName = location.name;
+			$scope.printlogs = [];
+			//Display the print logs
+			angular.forEach(location.location.printlog, function(printlog){
+				var logicon = "";
+				if(printlog.print_status_id == 5 || printlog.print_status_id == 8){
+					logicon = "ion-checkmark-circled";
+					$scope.validNextStatsus = false;
+				}
+				else{
+					logicon = "ion-checkmark";
+				}
+				$scope.printlogs.push({
+					"name": Helpers.getObjectById(printlog.print_status_id, localStorageService.get("printstatuses")).name,
+					"icon": logicon
+				});
+			});
+
+			if($scope.printlogs.length == 0)
+				$scope.validNextStatsus = true;
+
+			// location.location.printlog;
 		};
 
-		//function to process a printer location, and other locations can't be selected.
-		$scope.movetoNext = function(){
-			$scope.processing = true;
-		};
+		// //function to process a printer location, and other locations can't be selected.
+		// $scope.movetoNext = function(){
+		// 	$scope.processing = true;
+		// };
 
 		$scope.printNN = function(){
 			$scope.processing = true;
@@ -363,5 +442,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 var ROLES = ["Prep", "Printer", "QC", "Manager"];
 var NON_MANAGER_DIV = "NonManagerDiv";
-var MANAGER_DIV = "ManagerDiv";
+var ASSIGNED_MANAGER_DIV = "AssignedManagerDiv";
+var UNASSIGNED_MANAGER_DIV = "UnassignedManagerDiv";
 var PRINTER_DIV = "PrinterDiv";

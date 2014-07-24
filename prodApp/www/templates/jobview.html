@@ -11,26 +11,32 @@
         <div id="managerdiv" class="cusdiv contentdiv" ng-include="ManagerDiv"></div> 
         <div id="previewdiv" class="contentdiv">
             <div ng-repeat="preview in previews" 
-                 ng-click="selectedLocation($index, preview.name)" 
+                 ng-click="selectedLocation($index, preview)" 
                  ng-class="{'highlighted': $index==selectedImg,
                             'unhighlighted': $index!=selectedImg && !processing,
                             'invalid': processing && $index != selectedImg} " >
                 <img                     
                     ng-src="/img/jobs/{{job.id}}/{{preview.name}}.jpg" 
-                    alt="{{preview.location}}" 
-                    title="{{preview.location}}" style="height: 40px; width: 40px">
+                    alt="{{preview.name}}" 
+                    title="{{preview.name}}" style="height: 40px; width: 40px">
             </div>
         </div>
         <div id="large-preview" class="contentdiv"
              ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
             <div class="row" style="margin-left: 0px">
-                <div id="largeimagediv" style="margin-left: 0px"
-                     class="col col-25">
+                <div id="largeimagediv" style="margin: 0px" class="col-20"
+                     >
                     <img ng-src=" {{selectedImgSrc}} "  
                          alt="{{largePreviewText}}" 
-                         title="{{largePreviewText}}" style="width: 200px; height: 273px; margin-left: 0px">
+                         title="{{largePreviewText}}" style="margin-left: 0px">
                 </div>
-                <div id="printlogdiv">
+                <div id="printlogdiv" class="list list-inset contentdiv col-80" style="margin: 0px">
+                    <div class="item item-divider">
+                        Print Log - {{largePreviewName}}
+                    </div>
+                    <div ng-repeat="printlog in printlogs | orderBy:orderProp" class="item icon-left {{printlog.icon}}">
+                        {{printlog.name}}
+                    </div>
                 </div>
             </div>
             <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div>     
@@ -68,9 +74,7 @@
             <div class="item item-divider">
                 Job Log
             </div>
-            <div ng-repeat="joblog in joblogs | orderBy:orderProp:true" class="item icon-left {{joblog.icon}}" 
-                 ng-class="{'qccomplete': qccomplete == true, 
-                            'non-qccomplete': qccomplete != true}">
+            <div ng-repeat="joblog in joblogs | orderBy:orderProp" class="item icon-left {{joblog.icon}}">
                 {{joblog.name}}
             </div>
         </div>

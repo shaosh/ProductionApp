@@ -118,6 +118,15 @@ angular.module('starter.services', [])
 			}
 			return null;
 		},
+
+		findAssignedStaff: function(roleid, staffList){
+			for(var i = 0; i < staffList.length; i++){
+				if(staffList[i].role_id == roleid){
+					return staffList[i];
+				}
+			}
+			return null;
+		}
 	}
 })
 

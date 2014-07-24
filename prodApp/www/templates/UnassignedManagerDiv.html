@@ -12,7 +12,9 @@
         </select>
     </div>
     <div class="col-33">
-        <button class="button button-positive" id="assignbtn" ng-click="assign()">
+        <button class="button" id="assignbtn" ng-click="assign()"
+                ng-class="{'assigned': assigned}">
             Assign the Job
         </button>
     </div>
+</div>
