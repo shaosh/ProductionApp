@@ -1,7 +1,7 @@
 
 angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageModule'])
 
-.controller('LoginCtrl', function($scope, $location, $cookieStore, localStorageService, cssInjector, User, Account, Api){
+.controller('LoginCtrl', function($scope, $location, $cookieStore, localStorageService, cssInjector, Account, Api, Helpers){
 	if(
 		// $cookieStore.get("username") != undefined &&
 		$cookieStore.get("user") != undefined &&
@@ -54,7 +54,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		}
 
 		Api.getData("staffs").query(function(data){
-			var user = Api.getStaffByName(username, data);
+			var user = Helpers.getObjectByName(username, data);
 			if(user != null && roleid == user.role_id){
 				Account.login(user, password, rolename);
 
@@ -122,7 +122,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$scope.logindata.username = $cookieStore.get("");
 		$scope.logindata.password = $cookieStore.get("");
 		$scope.logindata.roleid = $cookieStore.get("");
-	}
+	};
 })
 
 .controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, Helpers, Account, Api){
@@ -185,11 +185,16 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// $scope.orderProp = '';
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, localStorageService, cssInjector, Helpers, Account, Api){
+.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, $cacheFactory, localStorageService, cssInjector, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/jobview.css');
 	var user = $cookieStore.get("user");	
 	var roles = localStorageService.get("roles");
+	
+	// alert(JSON.stringify($cacheFactory.get('$http').info()));
+	// $cacheFactory.get('$http').remove('data/jobs');
+	// alert(JSON.stringify($cacheFactory.get('$http').info()));
+
 
 	$scope.user = user;
 	$scope.rolename = $cookieStore.get("rolename");
@@ -210,29 +215,53 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		}
 		$scope.job = job;
 		$scope.previews = job.location;
+		$scope.facility_name = Helpers.getObjectById(job.facility_id, localStorageService.get("facilities")).name;
+
+		$scope.joblogs = [];
+		// var = logicons = ["ion-android-timer", "ion-android-checkmark", "ion-arrow-right-b", ];
+
+		for(var i = 0; i < job.log.length; i++){
+			var logname = Helpers.getObjectById(job.log[i].job_status_id, localStorageService.get("logstatuses")).name;
+			var logicon = "";
+			if(i != job.log.length - 1 || job.log[i].job_status_id == 1 || job.log[i].job_status_id == 3 || job.log[i].job_status_id == 5)
+				logicon = "ion-checkmark";
+			else if( job.log[i].job_status_id == 6)
+				logicon = "ion-checkmark-circled";
+			else
+				logicon = "ion-arrow-right-a";
+			$scope.joblogs.push({
+				"name": logname,
+				"icon": logicon
+			});
+		}
+		// angular.forEach(job.log, function(log){
+		// 	var logname = Helpers.getObjectById(log.job_status_id, localStorageService.get("logstatuses")).name;
+		// 	if(
+
+
+		// 	$scope.joblogs.push({
+		// 		"name": logname,
+		// 	});
+		// });
+		// alert($scope.joblogs.length);
+
+		// $scope.joblogs = job.log;
+		$scope.orderProp = "id";
 
 		if($scope.rolename != roles[3].name){
 			$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
 		}
 		else{
-			// alert(3);
-			Api.getData("staffs").query(function(data){
-				$scope.preps = [];
-				$scope.printers = [];
-				// alert(4);
+			$scope.preps = [];
+			$scope.printers = [];
+			Api.getData("staffs").query(function(data){				
 				angular.forEach(data, function(staff){
-					// alert(5);
-					// alert(staff.role_id + ":" + roles[0].id);
-					// alert(Helpers.selectStaffByFacility(user, staff));
 					if(staff.role_id == roles[0].id && Helpers.facilityIdCompare(staff, job)){
-						// alert(staff.name);
 						$scope.preps.push(staff);
 					}
 					else if(staff.role_id == roles[1].id && Helpers.facilityIdCompare(staff, job)){
-						// alert(staff.name);
 						$scope.printers.push(staff);
 					}
-					// alert(6);
 				});
 			});
 			$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
@@ -240,8 +269,14 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$scope.assign = function(){
 				if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
 					$scope.alert = "Incomplete Assignment";
+					return;
 				}
-			}
+				var staffs = [];
+				staffs.push(Helpers.getObjectById($scope.assignee.prep, $scope.preps));
+				staffs.push(Helpers.getObjectById($scope.assignee.printer, $scope.printers));
+				Api.assignStaffs(staffs, job.id);
+			};
+
 		}
 		if(user.role_id == roles[1].id){
 			$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
@@ -249,7 +284,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		
 		//Tag to mark if a location is being printing. If so, the user can't select other printer location.
 		$scope.processing = false;
-
 		//funciton to select printer location
 		$scope.selectedLocation = function(img, location){
 			if($scope.processing)
@@ -257,16 +291,16 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$scope.selectedImg = img;
 			$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
 			$scope.largePreviewText = location + " is not included in the design";
-		}
+		};
 
 		//function to process a printer location, and other locations can't be selected.
 		$scope.movetoNext = function(){
 			$scope.processing = true;
-		}
+		};
 
 		$scope.printNN = function(){
 			$scope.processing = true;
-		}
+		};
 	});
 
 	//Code to execute after the job is fetched

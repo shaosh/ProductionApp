@@ -99,7 +99,25 @@ angular.module('starter.services', [])
 				return true;
 			}
 			return false;
-		}
+		},
+
+		//getStaffByID from local array
+		getObjectById: function(id, list){
+			for(var i = 0; i < list.length; i++){
+				if(list[i].id == id)
+					return list[i];
+			}
+			return null;
+		},
+
+		//getStaffByName from local array
+		getObjectByName: function(name, list){
+			for(var i = 0; i < list.length; i++){
+				if(list[i].name == name)
+					return list[i];
+			}
+			return null;
+		},
 	}
 })
 
@@ -108,10 +126,20 @@ angular.module('starter.services', [])
 		//Get All Kinds of Data
 		getData: function(datatype){
 			var url = "data/" + datatype + ".json";
+			var cache = ["jobs", "staffs"];
+			if(cache.indexOf(datatype) > -1){
+				return $resource(url, {}, {
+					query: {
+						method: "GET",
+						cache: true,
+						isArray: true
+					}
+				});
+			}
 			return $resource(url, {}, {
 				query: {
 					method: "GET",
-					cache: true,
+					cache: false,
 					isArray: true
 				}
 			});
@@ -147,14 +175,29 @@ angular.module('starter.services', [])
 				return result;
 			});
 		}, 
+		assignStaffs: function(staffs, jobId){
+			alert("jobid: " + jobId);
+			var post = this.getData("jobs").query(function(){				
+				angular.forEach(staffs, function(staff){
+					for(var i = 0; i < post.length; i++){
+						// alert(i);
+						if(post[i].id == jobId){
+							// alert(post[i].name);
+							// post[i].name = "changed";
+							// alert(JSON.stringify(post[i].$save()));	
+							// alert(JSON.stringify(post[i]));
+							alert(i + " before: " + JSON.stringify(post[i]));
+							post[i].staff.push(staff);
+							post[i].$save();	//This $save() can't update the local json file. Not sure if it can update the remote server data. 
+							alert(i + " after: " + JSON.stringify(post[i]));						
+							continue;
+						}
+					}
+				});
+			});
+		},
 
-		//getStaffByName $resource version
-		getStaffByName: function(username, users){
-			for(var i = 0; i < users.length; i++){
-				if(users[i].name == username)
-					return users[i];
-			}
-			return null;
+		
 			// var url = 'data/staffs.json';
 			// var users = $resource(url);
 			// func = users.query(function(){
@@ -167,7 +210,7 @@ angular.module('starter.services', [])
 			// 	}
 			// 	alert("new func: " + func.name);
 			// });
-		},
+		
 
 		//getStaffByName $http version
 		// getStaffByName: function(name){

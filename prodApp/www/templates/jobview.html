@@ -23,60 +23,56 @@
         </div>
         <div id="large-preview" class="contentdiv"
              ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
-            <img ng-src=" {{selectedImgSrc}} "  
-                 alt="{{largePreviewText}}" 
-                 title="{{largePreviewText}}" style="width: 200px; height: 273px;">
+            <div class="row">
+                <div id="largeimagediv"
+                     class="col col-25">
+                    <img ng-src=" {{selectedImgSrc}} "  
+                         alt="{{largePreviewText}}" 
+                         title="{{largePreviewText}}" style="width: 200px; height: 273px;">
+                </div>
+                <div id="printlogdiv">
+                </div>
+            </div>
             <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div>     
         </div>            
         <div id="detaildiv" class="list list-inset contentdiv">
-            <div class="item">
-                ID:
+            <div class="item item-divider">
+                Job Info
             </div>
             <div class="item">
-                Facility:
+                ID: {{job.id}}
             </div>
             <div class="item">
-                Name:
+                Name: {{job.name}}
             </div>
             <div class="item">
-                Admin Statuses:
+                Facility: {{facility_name}} (Facility ID: {{job.facility_id}})
             </div>
             <div class="item">
-                Ship by Date:
+                Admin Statuses: {{job.adminstatus}}
             </div>
             <div class="item">
-                Ink Colors:
+                Ship by Date: {{job.shipbydate}}
             </div>
             <div class="item">
-                Substitute Notes/Product Name:
+                Ink Colors: {{job.inkcolors}}
             </div>
             <div class="item">
-                Quantities by Size:
+                Substitute Notes/Product Name: {{job.notespn}}
+            </div>
+            <div class="item">
+                Quantities by Size: {{job.quantitybysize}}
+            </div>
+        </div>
+        <div id="joblogdiv" class="list list-inset contentdiv">
+            <div class="item item-divider">
+                Job Log
+            </div>
+            <div ng-repeat="joblog in joblogs | orderBy:orderProp:true" class="item icon-left {{joblog.icon}}" >
+                {{joblog.name}}
             </div>
         </div>
         <div class="cusdiv contentdiv" id="printerdiv" ng-include="PrinterDiv" ></div>
-        <!-- <div class="list list-inset">
-            <label class="item item-input">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input type="text" placeholder="Search" ng-model="query">
-            </label>
-            <br>
-            <select ng-model="orderProp">
-                <option value="" selected disabled>--Sort by--</option>
-                <option value="name">Name</option>
-                <option value="id">Job ID</option>
-                <option value="date">Added Date</option>
-                <option value="facility">Facility Location</option>
-                <option value="status">Status</option>
-            </select>
-        </div>
-        <ion-list>
-            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp" class="item item-avatar" href="/job/{{job.id}}">
-                <img src="/img/jobs/{{job.id}}.jpg">
-                <h2>Job Name: {{job.name}}</h2>
-                <p>Job ID: {{job.id}}</p>
-            </a>
-        </ion-list>   -->
     </ion-content>
     <div class="bar bar-footer bar-dark">
         <div class="title">DAS Production V2</div>
