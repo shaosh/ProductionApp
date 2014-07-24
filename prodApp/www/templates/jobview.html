@@ -23,12 +23,12 @@
         </div>
         <div id="large-preview" class="contentdiv"
              ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
-            <div class="row">
-                <div id="largeimagediv"
+            <div class="row" style="margin-left: 0px">
+                <div id="largeimagediv" style="margin-left: 0px"
                      class="col col-25">
                     <img ng-src=" {{selectedImgSrc}} "  
                          alt="{{largePreviewText}}" 
-                         title="{{largePreviewText}}" style="width: 200px; height: 273px;">
+                         title="{{largePreviewText}}" style="width: 200px; height: 273px; margin-left: 0px">
                 </div>
                 <div id="printlogdiv">
                 </div>
