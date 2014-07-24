@@ -219,7 +219,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 		$scope.joblogs = [];
 		// var = logicons = ["ion-android-timer", "ion-android-checkmark", "ion-arrow-right-b", ];
-
 		for(var i = 0; i < job.log.length; i++){
 			var logname = Helpers.getObjectById(job.log[i].job_status_id, localStorageService.get("logstatuses")).name;
 			var logicon = "";
@@ -229,6 +228,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				logicon = "ion-checkmark-circled";
 			else
 				logicon = "ion-arrow-right-a";
+
 			$scope.joblogs.push({
 				"name": logname,
 				"icon": logicon

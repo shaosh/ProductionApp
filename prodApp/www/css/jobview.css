@@ -12,7 +12,7 @@
 .highlighted{
 	height: 46px;
 	width: 46px;
-	border: 3px solid #43cee6;
+	border: 3px solid #9CD429;
 	margin: 3px;
 }
 
@@ -100,8 +100,17 @@
 	font-weight: bold;
 }
 
+#joblogdiv .item:nth-child(8){
+	background-color: #9CD429;
+}
 
+/*.qccomplete{
+	background-color: #9CD429;
+}
 
+.non-qccomplete{
+	background-color: #FFFFFF;
+}*/
 /*img{
 	border-radius: 4px;
 }*/

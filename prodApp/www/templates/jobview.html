@@ -68,7 +68,9 @@
             <div class="item item-divider">
                 Job Log
             </div>
-            <div ng-repeat="joblog in joblogs | orderBy:orderProp:true" class="item icon-left {{joblog.icon}}" >
+            <div ng-repeat="joblog in joblogs | orderBy:orderProp:true" class="item icon-left {{joblog.icon}}" 
+                 ng-class="{'qccomplete': qccomplete == true, 
+                            'non-qccomplete': qccomplete != true}">
                 {{joblog.name}}
             </div>
         </div>
