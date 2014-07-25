@@ -50,12 +50,70 @@
 			{
 				"id": 1,
 				"jobid": 554114,
-				"location_id": 1
+				"location_id": 1,
+				"printlog":[
+					{
+						"id": 0,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 0
+					},
+					{
+						"id": 1,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 1
+					},
+					{
+						"id": 2,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 2
+					},
+					{
+						"id": 3,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 3
+					},
+					{
+						"id": 4,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 4
+					},
+					{
+						"id": 5,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 5
+					}
+				]
 			},
 			{
 				"id": 2,
 				"jobid": 554114,
-				"location_id": 10
+				"location_id": 10,
+				"printlog":[
+					{
+						"id": 0,
+						"job_id": 554114,
+						"location_id": 10,
+						"print_status_id": 6
+					},
+					{
+						"id": 1,
+						"job_id": 554114,
+						"location_id": 10,
+						"print_status_id": 7
+					},
+					{
+						"id": 2,
+						"job_id": 554114,
+						"location_id": 10,
+						"print_status_id": 8
+					}
+				]
 			}
 		], 
 		"staff": [
@@ -98,7 +156,13 @@
 				"id": 3,
 				"job_id": 554114,
 				"job_status_id": 3
+			},
+			{
+				"id": 4,
+				"job_id": 554114,
+				"job_status_id": 4
 			}
+
 		]
 	},
 	{

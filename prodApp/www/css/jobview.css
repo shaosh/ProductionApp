@@ -33,6 +33,11 @@
 	width: 40px;
 }
 */
+
+#previewdiv{
+	margin-top: 20px;
+}
+
 #previewdiv div{
 	display:inline-block;
 }

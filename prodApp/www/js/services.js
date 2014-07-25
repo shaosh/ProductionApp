@@ -111,6 +111,20 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
+		//Traverse the print log of every print location, if any one has its printing complete, it is ready for QC
+		isJobReadyForQC: function(job){
+			var locations = job.location;
+			for(var i = 0; i < locations.length; i++){
+				if(locations[i].location_id == localStorageService.get("NamesNumbers"))
+					var length = 2;
+				else
+					var length = 5;
+				if(locations[i].printlog.length == length)
+					return true;
+			}
+			return false;
+		},
+
 		//getStaffByID from local array
 		getObjectById: function(id, list){
 			for(var i = 0; i < list.length; i++){
@@ -154,11 +168,9 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		//Check if printing of all locations of a job is completed based on print log
-		//locationList is the constant list of locations and their corresponding location_id
-		checkPrintingComplete: function(job, locationList, roleid){
+		checkPrintingComplete: function(job, roleid, locationid){
 			var locations = job.location;
 			var isComplete = true;
-
 			if(localStorageService.get("QC") == roleid){
 				var nnLength = 3;
 				var regularLength = 6;
@@ -168,18 +180,19 @@ angular.module('starter.services', ['LocalStorageModule'])
 				var nnLength = 2;
 				var regularLength = 5;
 			}
-
 			for(var i = 0; i < locations.length; i++){
-				if(locations[i].location_id != locationList[10].id){
-					if(locations[i].printlog.length != regularLength){
-						isComplete = false;
-						break;
+				if(locations[i].location_id != locationid){
+					if(locations[i].location_id != localStorageService.get("NamesNumbers")){
+						if(locations[i].printlog.length < regularLength){
+							isComplete = false;
+							break;
+						}
 					}
-				}
-				else{
-					if(locations[i].printlog.length != nnLength){
-						isComplete = false;
-						break;
+					else{
+						if(locations[i].printlog.length < nnLength){
+							isComplete = false;
+							break;
+						}
 					}
 				}
 			}
