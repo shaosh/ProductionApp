@@ -360,7 +360,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			// $scope.movetoNextPrintStatus = function(){
 			// 	if(!$scope.validNextPrintStatsus)
 			// 		return;
-			// 	$scope.processing = true;
 
 			// };
 		}
@@ -368,8 +367,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		else{
 			$scope.preps = [];
 			$scope.printers = [];
-			var prep = Helpers./*findAssignedStaff*/getObjectById(localStorageService.get("Prep"), job.staff);
-			var printer = Helpers./*findAssignedStaff*/getObjectById(localStorageService.get("Printer"), job.staff);
+			var prep = Helpers.findAssignedStaff(localStorageService.get("Prep"), job.staff);
+			var printer = Helpers.findAssignedStaff(localStorageService.get("Printer"), job.staff);
 			//If this job is already assigned
 			if(prep != null && printer != null){
 				Api.getData("staffs").query(function(data){				
@@ -445,7 +444,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$scope.movetoNextPrintStatus = function(){
 				if(!$scope.validNextPrintStatsus)
 					return;
-				$scope.processing = true;
+				// $scope.processing = true;
 				var printlogList = localStorageService.get("printstatuses");
 				var logicon = "ion-checkmark";	
 				$scope.currentPrintStatus++;
@@ -503,11 +502,11 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		}
 		
 		//Tag to mark if a location is being printing. If so, the user can't select other printer location.
-		$scope.processing = false;
+		// $scope.processing = false;
 		//funciton to select printer location
 		$scope.selectedLocation = function(img, location){
-			if($scope.processing)
-				return;
+			// if($scope.processing)
+			// 	return;
 			$scope.selectedImg = img;
 			$scope.selectedImgSrc = location.src;
 			$scope.largePreviewText = location.name + " is not included in the design";
@@ -581,11 +580,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 		// //function to process a printer location, and other locations can't be selected.
 		// $scope.movetoNext = function(){
-		// 	$scope.processing = true;
 		// };
 
 		// $scope.printNN = function(){
-		// 	$scope.processing = true;
 		// };
 	});
 
@@ -624,24 +621,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// }
 	
 	// //Tag to mark if a location is being printing. If so, the user can't select other printer location.
-	// $scope.processing = false;
 
 	// //funciton to select printer location
 	// $scope.selectedLocation = function(img, location){
-	// 	if($scope.processing)
-	// 		return;
+
 	// 	$scope.selectedImg = img;
 	// 	$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
 	// 	$scope.largePreviewText = location + " is not included in the design";
-	// }
-
-	// //function to process a printer location, and other locations can't be selected.
-	// $scope.movetoNext = function(){
-	// 	$scope.processing = true;
-	// }
-
-	// $scope.printNN = function(){
-	// 	$scope.processing = true;
 	// }
 
 

@@ -125,6 +125,34 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
+		//Check if the location is complete
+		isLocationComplete: function(roleid, location){
+			if(localStorageService.get("QC") == roleid){
+				var nnLength = 3;
+				var regularLength = 6;
+			}
+			//Actually role == "Printer"
+			else{
+				var nnLength = 2;
+				var regularLength = 5;
+			}
+
+			//Check regular location
+			if(location.location_id != localStorageService.get("NamesNumbers")){
+				if(location.printlog.length < regularLength)
+					return false;
+				else
+					return true;
+			}
+			else{
+				if(location.printlog.length < nnLength)
+					return false;
+				else
+					return true;
+			}
+
+		},
+
 		//getStaffByID from local array
 		getObjectById: function(id, list){
 			for(var i = 0; i < list.length; i++){
@@ -144,15 +172,14 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		//find the responsible user of particular role
-		//Seems to be useless, can be merged with getObjectById
-		// findAssignedStaff: function(roleid, staffList){
-		// 	for(var i = 0; i < staffList.length; i++){
-		// 		if(staffList[i].role_id == roleid){
-		// 			return staffList[i];
-		// 		}
-		// 	}
-		// 	return null;
-		// },
+		findAssignedStaff: function(roleid, staffList){
+			for(var i = 0; i < staffList.length; i++){
+				if(staffList[i].role_id == roleid){
+					return staffList[i];
+				}
+			}
+			return null;
+		},
 
 		//Check if the printer has "Names & Numbers" job
 		hasNamesNumbers: function(job, nnid){
@@ -170,33 +197,36 @@ angular.module('starter.services', ['LocalStorageModule'])
 		//Check if printing of all locations of a job is completed based on print log
 		checkPrintingComplete: function(job, roleid, locationid){
 			var locations = job.location;
-			var isComplete = true;
-			if(localStorageService.get("QC") == roleid){
-				var nnLength = 3;
-				var regularLength = 6;
-			}
-			//Actually role == "Printer"
-			else{
-				var nnLength = 2;
-				var regularLength = 5;
-			}
+			// var isComplete = true;
+			// if(localStorageService.get("QC") == roleid){
+			// 	var nnLength = 3;
+			// 	var regularLength = 6;
+			// }
+			// //Actually role == "Printer"
+			// else{
+			// 	var nnLength = 2;
+			// 	var regularLength = 5;
+			// }
+
 			for(var i = 0; i < locations.length; i++){
 				if(locations[i].location_id != locationid){
-					if(locations[i].location_id != localStorageService.get("NamesNumbers")){
-						if(locations[i].printlog.length < regularLength){
-							isComplete = false;
-							break;
-						}
-					}
-					else{
-						if(locations[i].printlog.length < nnLength){
-							isComplete = false;
-							break;
-						}
-					}
+					if(this.isLocationComplete(roleid, locations[i]) == false)
+						return false;
+					// if(locations[i].location_id != localStorageService.get("NamesNumbers")){
+					// 	if(locations[i].printlog.length < regularLength){
+					// 		isComplete = false;
+					// 		break;
+					// 	}
+					// }
+					// else{
+					// 	if(locations[i].printlog.length < nnLength){
+					// 		isComplete = false;
+					// 		break;
+					// 	}
+					// }
 				}
 			}
-			return isComplete;
+			return true;
 		}
 	}
 })
