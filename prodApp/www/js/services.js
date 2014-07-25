@@ -92,7 +92,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 	}	
 })
 
-.factory('Helpers', function() {
+.factory('Helpers', function(localStorageService) {
 	return{
 		//find if a job should be pushed into the job list of a staff based on facility ID
 		facilityIdCompare: function(staff, job){
@@ -155,18 +155,29 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 		//Check if printing of all locations of a job is completed based on print log
 		//locationList is the constant list of locations and their corresponding location_id
-		checkPrintingComplete: function(job, locationList){
+		checkPrintingComplete: function(job, locationList, roleid){
 			var locations = job.location;
 			var isComplete = true;
+
+			if(localStorageService.get("QC") == roleid){
+				var nnLength = 3;
+				var regularLength = 6;
+			}
+			//Actually role == "Printer"
+			else{
+				var nnLength = 2;
+				var regularLength = 5;
+			}
+
 			for(var i = 0; i < locations.length; i++){
 				if(locations[i].location_id != locationList[10].id){
-					if(locations[i].printlog.length != 6){
+					if(locations[i].printlog.length != regularLength){
 						isComplete = false;
 						break;
 					}
 				}
 				else{
-					if(locations[i].printlog.length != 3){
+					if(locations[i].printlog.length != nnLength){
 						isComplete = false;
 						break;
 					}
