@@ -101,6 +101,15 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
+		//find if a specific prep or 
+		isStaffinJob: function(staff, job){
+			for(var i = 0; i < job.staff.length; i++){
+				if(job.staff[i].staff_id == staff.id)
+					return true;
+			}
+			return false;
+		},
+
 		//getStaffByID from local array
 		getObjectById: function(id, list){
 			for(var i = 0; i < list.length; i++){
@@ -119,6 +128,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return null;
 		},
 
+		//find the responsible user of particular role
 		findAssignedStaff: function(roleid, staffList){
 			for(var i = 0; i < staffList.length; i++){
 				if(staffList[i].role_id == roleid){

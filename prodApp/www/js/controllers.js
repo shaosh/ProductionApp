@@ -23,7 +23,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$scope.logindata.username = $cookieStore.get("user").name;
 		$scope.logindata.roleid = $cookieStore.get("user").role_id;
 	}
-		
+
 	if($cookieStore.get("password") != undefined)
 		$scope.logindata.password = $cookieStore.get("password");
 	// if($cookieStore.get("roleid") != undefined)
@@ -119,13 +119,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		// $cookieStore.remove("facilityid");
 		$cookieStore.remove("rolename");
 
-		$scope.logindata.username = $cookieStore.get("");
-		$scope.logindata.password = $cookieStore.get("");
-		$scope.logindata.roleid = $cookieStore.get("");
+		$scope.logindata.username = "";
+		$scope.logindata.password = "";
+		$scope.logindata.roleid = "";
 	};
 })
 
-.controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, Helpers, Account, Api){
+.controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, localStorageService, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('/css/overview.css');
 
@@ -140,14 +140,21 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.isOverview = false;
 	$scope.$logoff = Account;
 	$scope.$overview = Account;
+	var roles = localStorageService.get("roles");
 
 	Api.getData("jobs").query(function(data){
 			$scope.jobs = [];
 
 			angular.forEach(data, function(job){
-				if(Helpers.facilityIdCompare($scope.user, job)){
-					$scope.jobs.push(job);
+				if($scope.user.role_id == roles[2].id || $scope.user.role_id == roles[3].id){
+					if(Helpers.facilityIdCompare($scope.user, job)){
+						$scope.jobs.push(job);
+					}
 				}
+				else{
+					if(Helpers.isStaffinJob($scope.user, job))
+						$scope.jobs.push(job);
+				}				
 			});
 		}
 	);
@@ -261,29 +268,43 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			var logtextlist = [];
 			angular.forEach(localStorageService.get("logstatuses"), function(log){
 				if(log.role_id == user.role_id){
-					logtextlist.push(log.name);
+					logtextlist.push(log);
 				}
 			});
 
 			//Try to find: for a specific user, which status update is available
-			$scope.nextStatusText = "";
-			$scope.validNextStatsus = true;
+			$scope.nextStatusText = ""; 
+			if($scope.rolename != roles[1].name)
+				$scope.validNextStatsus = true;
+			else
+				$scope.validNextStatsus = false;
 			var currentStatus = 0;
-			for(var i = 0; i < logtextlist.length; i++){
-				var logExisted = false;
-				for(var j = 0; j < $scope.joblogs.length; j++){
-					if($scope.joblogs[j].name == logtextlist[i]){
-						logExisted = true;
+			if($scope.joblogs.length >= logtextlist[0].id){
+				for(var i = 0; i < logtextlist.length; i++){
+					var logExisted = false;
+					for(var j = 0; j < $scope.joblogs.length; j++){
+						if($scope.joblogs[j].name == logtextlist[i].name){
+							logExisted = true;
+						}
+					}
+					if(!logExisted && $scope.joblogs.length == logtextlist[i].id){
+						if(user.role_id != 1)
+							$scope.nextStatusText = "Move to Next Status: " + logtextlist[i].name;
+						else if(i == 0)
+							$scope.nextStatusText = PRINTING_NOT_STARTED;
+						else
+							$scope.nextStatusText = logtextlist[i - 1].name;
+						currentStatus = i;
+						break;
 					}
 				}
-				if(!logExisted){
-					$scope.nextStatusText = logtextlist[i];
-					currentStatus = i;
-					break;
+				if($scope.nextStatusText == ""){
+					$scope.nextStatusText = logtextlist[logtextlist.length - 1].name;
+					$scope.validNextStatsus = false;
 				}
 			}
-			if($scope.nextStatusText == ""){
-				$scope.nextStatusText = ASSIGNMENT_COMPLETED;
+			else{
+				$scope.nextStatusText = ASSIGNMENT_NOT_READY;
 				$scope.validNextStatsus = false;
 			}
 
@@ -299,7 +320,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					logicon = "ion-arrow-right-a";
 
 				$scope.joblogs.push({
-					"name": logtextlist[currentStatus],
+					"name": logtextlist[currentStatus].name,
 					"icon": logicon
 				});
 
@@ -309,10 +330,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 				currentStatus++;
 				if(currentStatus < logtextlist.length){
-					$scope.nextStatusText = logtextlist[currentStatus];					
+					$scope.nextStatusText = "Move to Next Status:" + logtextlist[currentStatus].name;					
 				}
 				else{
-					$scope.nextStatusText = ASSIGNMENT_COMPLETED;
+					$scope.nextStatusText = logtextlist[logtextlist.length - 1].name;
 					$scope.validNextStatsus = false;
 				}
 			};
@@ -514,4 +535,6 @@ var UNASSIGNED_MANAGER_DIV = "UnassignedManagerDiv";
 var PRINTER_DIV1 = "PrinterDiv1";
 var PRINTER_DIV2 = "PrinterDiv2";
 
-var ASSIGNMENT_COMPLETED = "Your Assignment Completed"
+var ASSIGNMENT_COMPLETED = "Assignment Completed";
+var ASSIGNMENT_NOT_READY = "Assignment Not Ready";
+var PRINTING_NOT_STARTED = "Printing Not Started";
