@@ -8,7 +8,8 @@
         <div class="contentdiv">
             <p class="assertive">{{alert}}</p>
         </div>
-        <div id="managerdiv" class="cusdiv contentdiv" ng-include="ManagerDiv"></div> 
+        <!-- <div id="managerdiv" class="cusdiv contentdiv" ng-include="ManagerDiv"></div> --> 
+        <div id="updatestatusdiv" class="cusdiv contentdiv" ng-include="UpdateStatusDiv"></div>
         <div id="previewdiv" class="contentdiv">
             <div ng-repeat="preview in previews" 
                  ng-click="selectedLocation($index, preview)" 
@@ -39,8 +40,10 @@
                     </div>
                 </div>
             </div>
-            <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div>     
-        </div>            
+            <!-- <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div> -->   
+            <div id="printerdiv1" class="cusdiv" ng-include="PrinterDiv1"></div>  
+        </div>  
+        <div id="printerdiv2" class="cusdiv contentdiv" ng-include="PrinterDiv2" ></div>          
         <div id="detaildiv" class="list list-inset contentdiv">
             <div class="item item-divider">
                 Job Info
@@ -78,7 +81,6 @@
                 {{joblog.name}}
             </div>
         </div>
-        <div class="cusdiv contentdiv" id="printerdiv" ng-include="PrinterDiv" ></div>
     </ion-content>
     <div class="bar bar-footer bar-dark">
         <div class="title">DAS Production V2</div>

@@ -64,6 +64,18 @@
 				"job_id": 554114,
 				"staff_id": 6,
 				"role_id": 3
+			},
+			{
+				"id": 1,
+				"job_id": 554114,
+				"staff_id": 0,
+				"role_id": 0
+			},
+			{
+				"id": 2,
+				"job_id": 554114,
+				"staff_id": 2,
+				"role_id": 1
 			}
 		],
 		"log": [
@@ -81,7 +93,8 @@
 				"id": 2,
 				"job_id": 554114,
 				"job_status_id": 2
-			},
+			}
+			,
 			{
 				"id": 3,
 				"job_id": 554114,

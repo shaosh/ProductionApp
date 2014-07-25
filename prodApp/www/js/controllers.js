@@ -143,6 +143,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 	Api.getData("jobs").query(function(data){
 			$scope.jobs = [];
+
 			angular.forEach(data, function(job){
 				if(Helpers.facilityIdCompare($scope.user, job)){
 					$scope.jobs.push(job);
@@ -256,14 +257,72 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 		//Add the next status button for non-manager users
 		if($scope.rolename != roles[3].name){
-			$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
+			$scope.UpdateStatusDiv = "/templates/" + NON_MANAGER_DIV + ".html";
+			var logtextlist = [];
+			angular.forEach(localStorageService.get("logstatuses"), function(log){
+				if(log.role_id == user.role_id){
+					logtextlist.push(log.name);
+				}
+			});
+
+			//Try to find: for a specific user, which status update is available
+			$scope.nextStatusText = "";
+			$scope.validNextStatsus = true;
+			var currentStatus = 0;
+			for(var i = 0; i < logtextlist.length; i++){
+				var logExisted = false;
+				for(var j = 0; j < $scope.joblogs.length; j++){
+					if($scope.joblogs[j].name == logtextlist[i]){
+						logExisted = true;
+					}
+				}
+				if(!logExisted){
+					$scope.nextStatusText = logtextlist[i];
+					currentStatus = i;
+					break;
+				}
+			}
+			if($scope.nextStatusText == ""){
+				$scope.nextStatusText = ASSIGNMENT_COMPLETED;
+				$scope.validNextStatsus = false;
+			}
+
+			$scope.movetoNextStatus = function(){
+				var logicon = "";
+				if($scope.joblogs.length == 3 || $scope.joblogs.length == 5)
+					logicon = "ion-checkmark";
+				else if($scope.joblogs.length == 6)
+					logicon = "ion-checkmark-circled";
+				else
+					logicon = "ion-arrow-right-a";
+
+				$scope.joblogs.push({
+					"name": logtextlist[currentStatus],
+					"icon": logicon
+				});
+
+				for(var i = 0; i < $scope.joblogs.length - 1; i++){
+					$scope.joblogs[i].icon = "ion-checkmark";
+				}
+
+				currentStatus++;
+				if(currentStatus < logtextlist.length){
+					$scope.nextStatusText = logtextlist[currentStatus];					
+				}
+				else{
+					$scope.nextStatusText = ASSIGNMENT_COMPLETED;
+					$scope.validNextStatsus = false;
+				}
+			}
+
 			// $scope.validNextStatsus = true;
 			//function to process a printer location, and other locations can't be selected.
-			$scope.movetoNext = function(){
-				if(!$scope.validNextStatsus)
-					return;
-				$scope.processing = true;
-			};
+			// $scope.movetoNextPrintStatus = function(){
+			// 	if(!$scope.validNextPrintStatsus)
+			// 		return;
+			// 	$scope.processing = true;
+
+			// };
 		}
 		//Add the assign job button for manager users
 		else{
@@ -283,7 +342,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						}
 					});
 				});
-				$scope.ManagerDiv = "/templates/" + ASSIGNED_MANAGER_DIV + ".html";	
+				$scope.UpdateStatusDiv = "/templates/" + ASSIGNED_MANAGER_DIV + ".html";	
 				$scope.assign = function(){
 					$scope.alert = "This job has already been assigned";
 				};
@@ -330,13 +389,19 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						$scope.alert = "This job has already been assigned";
 					}
 				};
-				$scope.ManagerDiv = "/templates/" + UNASSIGNED_MANAGER_DIV + ".html";
+				$scope.UpdateStatusDiv = "/templates/" + UNASSIGNED_MANAGER_DIV + ".html";
 			}			
 		}
 
-		//Add the print name and numbers button for printer users
+		//Add the areas specific for printer users
 		if(user.role_id == roles[1].id){
-			$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
+			$scope.PrinterDiv1 = "/templates/" + PRINTER_DIV1 + ".html";
+			$scope.PrinterDiv2 = "/templates/" + PRINTER_DIV2 + ".html";
+			$scope.movetoNextPrintStatus = function(){
+				if(!$scope.validNextPrintStatsus)
+					return;
+				$scope.processing = true;
+			};
 		}
 		
 		//Tag to mark if a location is being printing. If so, the user can't select other printer location.
@@ -355,7 +420,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				var logicon = "";
 				if(printlog.print_status_id == 5 || printlog.print_status_id == 8){
 					logicon = "ion-checkmark-circled";
-					$scope.validNextStatsus = false;
+					$scope.validNextPrintStatsus = false;
 				}
 				else{
 					logicon = "ion-checkmark";
@@ -367,7 +432,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			});
 
 			if($scope.printlogs.length == 0)
-				$scope.validNextStatsus = true;
+				$scope.validNextPrintStatsus = true;
 
 			// location.location.printlog;
 		};
@@ -444,4 +509,7 @@ var ROLES = ["Prep", "Printer", "QC", "Manager"];
 var NON_MANAGER_DIV = "NonManagerDiv";
 var ASSIGNED_MANAGER_DIV = "AssignedManagerDiv";
 var UNASSIGNED_MANAGER_DIV = "UnassignedManagerDiv";
-var PRINTER_DIV = "PrinterDiv";
+var PRINTER_DIV1 = "PrinterDiv1";
+var PRINTER_DIV2 = "PrinterDiv2";
+
+var ASSIGNMENT_COMPLETED = "Your Assignment Completed"

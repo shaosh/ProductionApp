@@ -1,4 +1,4 @@
-angular.module('starter.services', [])
+angular.module('starter.services', ['LocalStorageModule'])
 .factory('User', function(){
 	var users = [
 		{id: 0, name: "TimDuncan", role: ROLES[0]},
@@ -68,7 +68,7 @@ angular.module('starter.services', [])
 	}
 })
 
-.factory('Account', function($location, $cookieStore){
+.factory('Account', function($location, $cookieStore, localStorageService){
 	return{
 		login: function(user, password, rolename){
 			$cookieStore.put("user", user);
@@ -81,8 +81,8 @@ angular.module('starter.services', [])
 
 		logoff: function(){
 			$cookieStore.put("authenticated", "false");
-			global = {};
 			$location.path('/login');
+
 		},
 
 		overview: function(isOverview){
