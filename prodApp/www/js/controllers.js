@@ -288,6 +288,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 
 			$scope.movetoNextStatus = function(){
+				if(!$scope.validNextStatsus)
+					return;
 				var logicon = "";
 				if($scope.joblogs.length == 3 || $scope.joblogs.length == 5)
 					logicon = "ion-checkmark";
@@ -313,7 +315,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$scope.nextStatusText = ASSIGNMENT_COMPLETED;
 					$scope.validNextStatsus = false;
 				}
-			}
+			};
 
 			// $scope.validNextStatsus = true;
 			//function to process a printer location, and other locations can't be selected.
