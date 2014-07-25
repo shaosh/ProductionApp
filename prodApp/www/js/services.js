@@ -94,6 +94,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 .factory('Helpers', function() {
 	return{
+		//find if a job should be pushed into the job list of a staff based on facility ID
 		facilityIdCompare: function(staff, job){
 			if(staff.facility_id.indexOf(job.facility_id) > -1){
 				return true;
@@ -101,7 +102,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
-		//find if a specific prep or 
+		//find if a specific prep or printer is in the staff list of a job
 		isStaffinJob: function(staff, job){
 			for(var i = 0; i < job.staff.length; i++){
 				if(job.staff[i].staff_id == staff.id)
@@ -129,13 +130,49 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		//find the responsible user of particular role
-		findAssignedStaff: function(roleid, staffList){
-			for(var i = 0; i < staffList.length; i++){
-				if(staffList[i].role_id == roleid){
-					return staffList[i];
+		//Seems to be useless, can be merged with getObjectById
+		// findAssignedStaff: function(roleid, staffList){
+		// 	for(var i = 0; i < staffList.length; i++){
+		// 		if(staffList[i].role_id == roleid){
+		// 			return staffList[i];
+		// 		}
+		// 	}
+		// 	return null;
+		// },
+
+		//Check if the printer has "Names & Numbers" job
+		hasNamesNumbers: function(job, nnid){
+			for(var i = 0; i < job.location.length; i++){
+				if(job.location[i].location_id == nnid)
+					return true;
+			}
+			return false;
+		},
+
+		//Check if printing of a job is started based on print log
+		checkPrintingStart: function(job){
+		},
+
+		//Check if printing of all locations of a job is completed based on print log
+		//locationList is the constant list of locations and their corresponding location_id
+		checkPrintingComplete: function(job, locationList){
+			var locations = job.location;
+			var isComplete = true;
+			for(var i = 0; i < locations.length; i++){
+				if(locations[i].location_id != locationList[10].id){
+					if(locations[i].printlog.length != 6){
+						isComplete = false;
+						break;
+					}
+				}
+				else{
+					if(locations[i].printlog.length != 3){
+						isComplete = false;
+						break;
+					}
 				}
 			}
-			return null;
+			return isComplete;
 		}
 	}
 })

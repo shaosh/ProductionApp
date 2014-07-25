@@ -116,7 +116,11 @@
 }
 
 #printerdiv1{
-	margin-bottom: 20px;
+	margin-bottom: 10px;
+}
+
+#printerdiv2{
+	margin-bottom: 30px;
 }
 /*{
 	background-color: #9CD429;
