@@ -223,10 +223,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				var src = "/img/namesnums.png";
 			else
 				var src = "/img/jobs/" + job.id + "/" + previewname + ".jpg";
+			var isCompleted = Helpers.isLocationComplete(user.role_id, location);
 			$scope.previews.push({
 				"location": location, 
 				"src": src,
-				"name": previewname
+				"name": previewname,
+				"completed": isCompleted
 			});
 		});
 		$scope.facility_name = Helpers.getObjectById(job.facility_id, localStorageService.get("facilities")).name;
@@ -453,6 +455,14 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$scope.validNextPrintStatsus = false;
 					if(user.role_id == localStorageService.get("QC")){
 						$scope.nextPrintStatusText = Helpers.getObjectById($scope.currentPrintStatus, localStorageService.get("printstatuses")).name;
+						
+						for(var i = 0; i < $scope.previews.length; i++){
+							if($scope.previews[i].location.location_id == $scope.currentLocationID){
+								$scope.previews[i].completed = true;
+								alert(JSON.stringify($scope.previews[i]));
+							}
+						}
+
 						//If all locations are QCed, the job is completed for the QC.
 						if(Helpers.checkPrintingComplete(job, user.role_id, $scope.currentLocationID)){
 							$scope.currentStatus++;

@@ -28,6 +28,13 @@
     -webkit-filter: grayscale(1); /* Google Chrome, Safari 6+ & Opera 15+ */
 }
 
+.uncompleted-location{
+	/*Make the color img grayscale*/
+	filter: url(filters.svg#grayscale); /* Firefox 3.5+ */
+    filter: gray; /* IE6-9 */
+    -webkit-filter: grayscale(1); /* Google Chrome, Safari 6+ & Opera 15+ */
+}
+
 /*#previewdiv img{
 	height: 40px;
 	width: 40px;

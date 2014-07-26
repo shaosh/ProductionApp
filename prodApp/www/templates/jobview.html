@@ -14,10 +14,10 @@
             <div ng-repeat="preview in previews" 
                  ng-click="selectedLocation($index, preview)" 
                  ng-class="{'highlighted': $index==selectedImg,
-                            'unhighlighted': $index!=selectedImg && !processing,
-                            'invalid': processing && $index != selectedImg} " >
+                            'unhighlighted': $index!=selectedImg} " >
                 <img                     
                     ng-src="{{preview.src}}" 
+                    ng-class="{'uncompleted-location': {{preview.completed}}}"
                     alt="{{preview.name}}" 
                     title="{{preview.name}}" style="height: 40px; width: 40px">
             </div>

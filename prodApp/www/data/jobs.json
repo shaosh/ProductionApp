@@ -81,12 +81,6 @@
 						"job_id": 554114,
 						"location_id": 0,
 						"print_status_id": 4
-					},
-					{
-						"id": 5,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 5
 					}
 				]
 			},
@@ -166,11 +160,6 @@
 				"id": 5,
 				"job_id": 554114,
 				"job_status_id": 5
-			},
-			{
-				"id": 6,
-				"job_id": 554114,
-				"job_status_id": 6
 			}
 		]
 	},
