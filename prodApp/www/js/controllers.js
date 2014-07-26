@@ -459,7 +459,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						for(var i = 0; i < $scope.previews.length; i++){
 							if($scope.previews[i].location.location_id == $scope.currentLocationID){
 								$scope.previews[i].completed = true;
-								alert(JSON.stringify($scope.previews[i]));
 							}
 						}
 
@@ -478,6 +477,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					if(user.role_id == localStorageService.get("Printer")){
 						$scope.validNextPrintStatsus = false;
 						$scope.nextPrintStatusText = Helpers.getObjectById($scope.currentPrintStatus, localStorageService.get("printstatuses")).name;
+						
+						for(var i = 0; i < $scope.previews.length; i++){
+							if($scope.previews[i].location.location_id == $scope.currentLocationID){
+								$scope.previews[i].completed = true;
+							}
+						}
+
 						//If all locations are printed, the job is completed for the printer.
 						if(Helpers.checkPrintingComplete(job, user.role_id, $scope.currentLocationID)){
 							$scope.currentStatus++;
