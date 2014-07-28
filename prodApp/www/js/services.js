@@ -68,7 +68,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 	}
 })
 
-.factory('Account', function($location, $cookieStore, localStorageService){
+.factory('Account', function($location, $cookieStore, localStorageService, Api){
 	return{
 		login: function(user, password, rolename){
 			$cookieStore.put("user", user);
@@ -77,6 +77,55 @@ angular.module('starter.services', ['LocalStorageModule'])
 			$cookieStore.put("authenticated", "true");
 			// $cookieStore.put("roles", $scope.roles);
 			$location.path('/' + user.name + '/jobs');
+		},
+
+		cacheConstants: function(){
+			//Cache role list
+			var roles = localStorageService.get("roles");
+			for(var i = 0; i < roles.length; i++){
+				if(roles[i].name == "Prep")
+					localStorageService.set("Prep", roles[i].id);
+				else if(roles[i].name == "Printer")
+					localStorageService.set("Printer", roles[i].id);
+				else if(roles[i].name == "QC")
+					localStorageService.set("QC", roles[i].id);
+				else if(roles[i].name == "Manager")
+					localStorageService.set("Manager", roles[i].id);
+			}
+ 
+ 			//Cache other constant lists
+			var constants = ["locations", "facilities", "logstatuses", "printstatuses"];
+			angular.forEach(constants, function(constant){
+				Api.getData(constant).query(function(data){
+					localStorageService.set(constant, data);
+
+					//Put some special value into the local storage
+					if(constant == 'locations'){
+						for(var i = 0; i < data.length; i++){
+							if(data[i].name == "Names & Numbers")
+								localStorageService.set("NamesNumbers", data[i].id);
+						}
+					}
+				});
+			});
+
+			//Cache special statuses
+			//Job log
+			localStorageService.set("Manager_Completed_Log", 1);
+			localStorageService.set("Prep_Completed_Log", 3);
+			localStorageService.set("Printer_Completed_Log", 5);
+			localStorageService.set("QC_Completed_Log", 6);
+
+			//Print Log
+			localStorageService.set("Printer_Completed_Regular_PrintLog", 4);
+			localStorageService.set("QC_Completed_Regular_PrintLog", 5);
+			localStorageService.set("Printer_Completed_NN_PrintLog", 7);
+			localStorageService.set("QC_Completed_NN_PrintLog", 8);
+
+			localStorageService.set("Printer_Regular_PrintLog_Count", 5);
+			localStorageService.set("Printer_NN_PrintLog_Count", 2);
+			localStorageService.set("QC_Regular_PrintLog_Count", 6);
+			localStorageService.set("QC_NN_PrintLog_Count", 3);
 		},
 
 		logoff: function(){
@@ -116,9 +165,9 @@ angular.module('starter.services', ['LocalStorageModule'])
 			var locations = job.location;
 			for(var i = 0; i < locations.length; i++){
 				if(locations[i].location_id == localStorageService.get("NamesNumbers"))
-					var length = 2;
+					var length = localStorageService.get("Printer_NN_PrintLog_Count");
 				else
-					var length = 5;
+					var length = localStorageService.get("Printer_Regular_PrintLog_Count");
 				if(locations[i].printlog.length == length)
 					return true;
 			}
@@ -127,14 +176,16 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 		//Check if the location is complete
 		isLocationComplete: function(roleid, location){
+			if(location.printlog == undefined || location.printlog == [])
+				return false;
 			if(localStorageService.get("QC") == roleid){
-				var nnLength = 3;
-				var regularLength = 6;
+				var nnLength = localStorageService.get("QC_NN_PrintLog_Count");
+				var regularLength = localStorageService.get("QC_Regular_PrintLog_Count");
 			}
 			//Actually role == "Printer"
 			else{
-				var nnLength = 2;
-				var regularLength = 5;
+				var nnLength = localStorageService.get("Printer_NN_PrintLog_Count");
+				var regularLength = localStorageService.get("Printer_Regular_PrintLog_Count");
 			}
 
 			//Check regular location

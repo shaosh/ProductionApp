@@ -160,11 +160,6 @@
 				"id": 5,
 				"job_id": 554114,
 				"job_status_id": 5
-			},
-			{
-				"id": 6,
-				"job_id": 554114,
-				"job_status_id": 6
 			}
 		]
 	},
@@ -176,17 +171,20 @@
 			{
 				"id": 0,
 				"jobid": 554120,
-				"location_id": 0
+				"location_id": 0,
+				"printlog": []
 			},
 			{
 				"id": 1,
 				"jobid": 554120,
-				"location_id": 1
+				"location_id": 1,
+				"printlog": []
 			},
 			{
 				"id": 2,
 				"jobid": 554120,
-				"location_id": 6
+				"location_id": 6,
+				"printlog": []
 			}
 		], 
 		"staff": [
@@ -196,6 +194,8 @@
 				"staff_id": 6,
 				"role_id": 3
 			}
+		],
+		"log": [
 		]
 	},
 	{
