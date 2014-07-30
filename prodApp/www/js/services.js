@@ -122,6 +122,12 @@ angular.module('starter.services', ['LocalStorageModule'])
 			localStorageService.set("Printer_Completed_NN_PrintLog", 7);
 			localStorageService.set("QC_Completed_NN_PrintLog", 8);
 
+			//Count of Special Log
+			localStorageService.set("Manager_Pending_Log_Count", 1);
+			localStorageService.set("Prep_Pending_Log_Count", 2);
+			localStorageService.set("Printer_Pending_Log_Count", 4);
+
+			//Count of Special Print Log
 			localStorageService.set("Printer_Regular_PrintLog_Count", 5);
 			localStorageService.set("Printer_NN_PrintLog_Count", 2);
 			localStorageService.set("QC_Regular_PrintLog_Count", 6);
@@ -168,7 +174,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 					var length = localStorageService.get("Printer_NN_PrintLog_Count");
 				else
 					var length = localStorageService.get("Printer_Regular_PrintLog_Count");
-				if(locations[i].printlog.length == length)
+				if(locations[i].printlog != undefined && locations[i].printlog.length == length)
 					return true;
 			}
 			return false;
@@ -278,6 +284,23 @@ angular.module('starter.services', ['LocalStorageModule'])
 				}
 			}
 			return true;
+		},
+
+		incrementPendingnum: function(){
+			if(localStorageService.get('pendingnum') == "")
+				localStorageService.set('pendingnum', 0);
+			var pendingnum = localStorageService.get('pendingnum');
+			localStorageService.set('pendingnum', pendingnum + 1);
+		},
+
+		decrementPendingnum: function(){
+			var pendingnum = localStorageService.get("pendingnum");
+			if(pendingnum == "" || pendingnum == undefined)
+				return;
+			pendingnum--;
+			if(pendingnum == 0)
+				pendingnum = "";
+			localStorageService.set("pendingnum", pendingnum);
 		}
 	}
 })
@@ -356,23 +379,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 					}
 				});
 			});
-		},
-
-		
-			// var url = 'data/staffs.json';
-			// var users = $resource(url);
-			// func = users.query(function(){
-			// 	alert("func: " + func);
-			// 	for(var i = 0; i < func.length; i++){
-			// 		if(func[i].name == username){
-			// 			func = func[i];
-			// 			break;
-			// 		}
-			// 	}
-			// 	alert("new func: " + func.name);
-			// });
-		
-
+		},				
 		//getStaffByName $http version
 		// getStaffByName: function(name){
 		// 	var func = function(){
@@ -467,6 +474,31 @@ angular.module('starter.services', ['LocalStorageModule'])
 			// return promise;
 		}
 	}
+})
+
+.factory('socket', function($rootScope){
+	/* Locate socket IO server via the ip and port*/
+    var socket = io.connect("http://127.0.0.1:3000"); 
+    return {
+        on: function(eventName, callback) {
+            socket.on(eventName, function() {
+                var args = arguments;
+                $rootScope.$apply(function() {
+                    callback.apply(socket, args);
+                });
+            });
+        },
+        emit: function(eventName, data, callback) {
+            socket.emit(eventName, data, function() {
+                var args = arguments;
+                $rootScope.$apply(function() {
+                    if (callback) {
+                        callback.apply(socket, args);
+                    }
+                });
+            })
+        }
+    };
 });
 
 // .factory('Previews', function() {

@@ -1,3 +1,5 @@
 <button class="button button-dark icon ion-navicon" ng-click="$overview.overview()" style="height:32px"></button>
-<h2 class="title">{{rolename}}: {{user.name}}</h2>
+<h2 class="title">{{rolename}}: {{user.name}} 
+    <span title="Pending Job Number" class="badge" ng-class="{'pendingBadge': pendingnum > 0}">{{pendingnum}}<span>
+</h2>
 <button class="button button-dark" ng-click="$logoff.logoff({{isOverview}})">Log Out</button>

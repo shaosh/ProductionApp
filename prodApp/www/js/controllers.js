@@ -116,9 +116,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('OverviewCtrl', function($scope, $stateParams, $cookieStore, cssInjector, localStorageService, Helpers, Account, Api){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, cssInjector, localStorageService, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
+	cssInjector.add('css/subheader.css');
 
 	$scope.user = $cookieStore.get("user");
 	$scope.rolename = $cookieStore.get("rolename");
@@ -126,19 +127,65 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.isOverview = false;
 	$scope.$logoff = Account;
 	$scope.$overview = Account;
+	//Variable related to the order of the job list
+	$scope.reverse = false;
+	//Variable related to the pending number showed in the subtitle
+	// $rootScope.pendingnum = "";
+	//Have to stor the badge number in local storage, otherwise it is incorrect after refresh in the job view page.
+	localStorageService.set('pendingnum', "");
+	$rootScope.pendingnum = "";
+
+	$scope.reverseOrder = function(){
+		$scope.reverse = !$scope.reverse;
+	}
 
 	Api.getData("jobs").query(function(data){
 			$scope.jobs = [];
 			angular.forEach(data, function(job){
 				if($scope.user.role_id == localStorageService.get("QC") || $scope.user.role_id == localStorageService.get("Manager")){
 					if(Helpers.facilityIdCompare($scope.user, job)){
-						$scope.jobs.push(job);
+						//Check the status of each job, and determine if attach the "Pending" badge
+						if($scope.user.role_id == localStorageService.get("Manager") && job.log.length == localStorageService.get("Manager_Pending_Log_Count"))
+							job.pending = "Pending";
+						else if($scope.user.role_id == localStorageService.get("QC") && Helpers.isJobReadyForQC(job))
+							job.pending = "Pending";
+						else
+							job.pending = "";
+
+						//Add the job for the manager
+						if($scope.user.role_id == localStorageService.get("Manager"))
+							$scope.jobs.push(job);
+						//Add the job for the QC only when the job is ready for him
+						else if($scope.user.role_id == localStorageService.get("QC") && Helpers.isJobReadyForQC(job))
+							$scope.jobs.push(job);
 					}
 				}
 				else{
-					if(Helpers.isStaffinJob($scope.user, job))
+					if(Helpers.isStaffinJob($scope.user, job)){
+						//Check the status of each job, and determine if attach the "Pending" badge
+						if($scope.user.role_id == localStorageService.get("Prep") && job.log.length == localStorageService.get("Prep_Pending_Log_Count"))
+							job.pending = "Pending";
+						else if($scope.user.role_id == localStorageService.get("Printer") && job.log.length == localStorageService.get("Printer_Pending_Log_Count"))
+							job.pending = "Pending";
+						else
+							job.pending = "";
 						$scope.jobs.push(job);
-				}				
+					}
+				}	
+
+				//Calculate the pending job number in the badge in the subtitle
+				if(job.pending != "" && job.pending != undefined){
+					// if($rootScope.pendingnum == "")
+					// 	$rootScope.pendingnum = 0;
+					// $rootScope.pendingnum++;
+
+					// if(localStorageService.get('pendingnum') == "")
+					// 	localStorageService.set('pendingnum', 0);
+					// var pendingnum = localStorageService.get('pendingnum');
+					// localStorageService.set('pendingnum', pendingnum + 1);
+					Helpers.incrementPendingnum();
+					$rootScope.pendingnum = localStorageService.get('pendingnum');
+				}			
 			});
 		}
 	);
@@ -177,11 +224,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// $scope.orderProp = '';
 })
 
-.controller('JobviewCtrl', function($scope, $stateParams, $cookieStore, $cacheFactory, localStorageService, cssInjector, Helpers, Account, Api){
+.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, localStorageService, cssInjector, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
+	cssInjector.add('css/subheader.css');
 	var user = $cookieStore.get("user");	
 	var roles = localStorageService.get("roles");
+	$rootScope.pendingnum = localStorageService.get('pendingnum');
 	
 	// alert(JSON.stringify($cacheFactory.get('$http').info()));
 	// $cacheFactory.get('$http').remove('data/jobs');
@@ -194,6 +243,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.$logoff = Account;	
 	//function to go to overview page
 	$scope.$overview = Account;
+
 	//Code which depends on the job variable
 	//Fetch the specific job based on its job id.
 	Api.getData("jobs").query(function(data){
@@ -211,7 +261,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				var src = "img/namesnums.png";
 			else
 				var src = "img/jobs/" + job.id + "/" + previewname + ".jpg";
-			var isCompleted = Helpers.isLocationComplete(user.role_id, location);
+			if(user.role_id == localStorageService.get("Manager") || user.role_id == localStorageService.get("Prep"))
+				var isCompleted = true;
+			else
+				var isCompleted = Helpers.isLocationComplete(user.role_id, location);
 			$scope.previews.push({
 				"location": location, 
 				"src": src,
@@ -413,6 +466,14 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						});
 
 						$scope.alert = "Job assigned";
+						//Decrement the badge number
+						Helpers.decrementPendingnum();
+
+						$rootScope.pendingnum = localStorageService.get("pendingnum");
+						// $rootScope.pendingnum--;
+						// if($rootScope.pendingnum == 0)
+						// 	$rootScope.pendingnum = "";
+
 						$scope.assigned = false;
 					}
 					else{

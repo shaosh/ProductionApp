@@ -10,21 +10,29 @@
                 <input type="text" placeholder="Search" ng-model="query">
             </label>
             <br>
-            <select ng-model="orderProp">
-                <option value="" selected disabled>--Sort by--</option>
-                <option value="name">Name</option>
-                <option value="id">Job ID</option>
-                <option value="date">Added Date</option>
-                <option value="facility">Facility</option>
-                <option value="status">Status</option>
-            </select>
+            <div class="row" style="padding-left:0px; padding-right: 0px">
+                <div class="col-80">
+                    <select ng-model="orderProp">
+                        <option value="" selected disabled>--Sort by--</option>
+                        <option value="name">Name</option>
+                        <option value="id">Job ID</option>
+                        <option value="date">Added Date</option>
+                        <option value="facility_id">Facility</option>
+                        <option value="pending">Status</option>
+                    </select>
+                </div>
+                <div class="col-20" style="padding-left:2%">
+                    <button id="reversebtn" ng-click="reverseOrder()">Reverse</button>
+                </div>
+            </div>
         </div>
         <ion-list>
-            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp" class="item item-avatar" href="/#/{{user.name}}/jobs/{{job.id}}">
+            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp:reverse" class="item item-avatar" href="/#/{{user.name}}/jobs/{{job.id}}">
                 <img class="front" src="/img/jobs/{{job.id}}/front.jpg" alt="front" title="front" />
                 <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
                 <h2>Job Name: {{job.name}} (Job ID: {{job.id}})</h2>
                 <p>Facility: {{job.facility_id}}</p>
+                <span class="badge">{{job.pending}}</span>
             </a>
         </ion-list>  
     </ion-content>
