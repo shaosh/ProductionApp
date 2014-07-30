@@ -137,7 +137,6 @@ angular.module('starter.services', ['LocalStorageModule'])
 		logoff: function(){
 			$cookieStore.put("authenticated", "false");
 			$location.path('/login');
-
 		},
 
 		overview: function(isOverview){
@@ -248,7 +247,15 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		//Check if printing of a job is started based on print log
-		checkPrintingStart: function(job){
+		checkQCStart: function(job){
+			var locations = job.location;
+			var nnLength = localStorageService.get("Printer_NN_PrintLog_Count");
+			var regularLength = localStorageService.get("Printer_Regular_PrintLog_Count");
+			for(var i = 0; i < locations.length; i++){
+				if(this.isLocationComplete(localStorageService.get("QC"), locations[i]))
+					return true;
+			}
+			return false;
 		},
 
 		//Check if printing of all locations of a job is completed based on print log

@@ -7,7 +7,7 @@
         <div class="list list-inset">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="text" placeholder="Search" ng-model="query">
+                <input type="text" placeholder="Search" ng-model="overview.query">
             </label>
             <br>
             <div class="row" style="padding-left:0px; padding-right: 0px">
@@ -27,7 +27,7 @@
             </div>
         </div>
         <ion-list>
-            <a ng-repeat="job in jobs | filter:query | orderBy:orderProp:reverse" class="item item-avatar" href="/#/{{user.name}}/jobs/{{job.id}}">
+            <a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="/#/{{user.name}}/jobs/{{job.id}}">
                 <img class="front" src="/img/jobs/{{job.id}}/front.jpg" alt="front" title="front" />
                 <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
                 <h2>Job Name: {{job.name}} (Job ID: {{job.id}})</h2>
