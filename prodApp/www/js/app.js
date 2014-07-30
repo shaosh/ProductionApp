@@ -64,25 +64,5 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     // });
   
   $urlRouterProvider.otherwise('/login');
-
-
-    // $urlRouterProvider.otherwise(
-      // function(){
-      //   if(
-      //     $cookieStore.get("username") != undefined &&
-      //     $cookieStore.get("password") != undefined &&
-      //     $cookieStore.get("roleid") != undefined &&
-      //     $cookieStore.get("authenticated") == "true"
-      //   ){
-      //     return ('/' + $cookieStore.get("username") + '/jobs');
-      //   }
-      //   else{
-      //     return "/login";
-      //   }
-      // }
-    // );
-  // if($cookieStore.get(username))
-  //   $location.path('/user/' + user.id);
-
 });
 

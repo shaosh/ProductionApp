@@ -22,25 +22,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	if($cookieStore.get("password") != undefined)
 		$scope.logindata.password = $cookieStore.get("password");
 
-	// $scope.roles = Api.getRoles().query();
 	$scope.roles = Api.getData("roles").query();
-
-		// function(response){
-		// 	angular.forEach(response, function(item){
-		// 	});
-		// }
-	// );
-
-	// $scope.roles = Api.getRoles();
-	// Api.getRoles().then(function(response){
-	// 	$scope.roles = response.data;
-	// });
 
 	$scope.login = function(){
 		var username = $scope.logindata.username;
 		var password = $scope.logindata.password;
 		var roleid = $scope.logindata.roleid;
-		var rolename = $scope.roles[roleid].name;//$scope.logindata.rolename;
+		var rolename = $scope.roles[roleid].name;
 		if(username == undefined || password == undefined || roleid == undefined){
 			$scope.logindata.alert = "Error: Incomplete Authentication Information";
 			return;
@@ -54,54 +42,11 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				localStorageService.clearAll();
 				localStorageService.set("roles", $scope.roles);
 				Account.cacheConstants();
-
-				//Store each role and their index in the local storage
-				// for(var i = 0; i < $scope.roles.length; i++){
-				// 	if($scope.roles[i].name == "Prep")
-				// 		localStorageService.set("Prep", $scope.roles[i].id);
-				// 	else if($scope.roles[i].name == "Printer")
-				// 		localStorageService.set("Printer", $scope.roles[i].id);
-				// 	else if($scope.roles[i].name == "QC")
-				// 		localStorageService.set("QC", $scope.roles[i].id);
-				// 	else if($scope.roles[i].name == "Manager")
-				// 		localStorageService.set("Manager", $scope.roles[i].id);
-				// }
-
-				
 			}
 			else
 				$scope.logindata.alert = "Error: Incorrect Authentication Information";
 			}
 		);
-		
-
-		// Api.getStaffByName(username).then(function(response){
-		// 	if(response.name != undefined){
-		// 		$cookieStore.put("username", username);
-		// 		$cookieStore.put("userid", response.id);
-		// 		$cookieStore.put("password", password);
-		// 		$cookieStore.put("facilityid", response.facility_id);
-		// 		$cookieStore.put("roleid", response.role_id);
-		// 		$cookieStore.put("rolename", rolename);
-		// 		$cookieStore.put("authenticated", "true");
-		// 		$location.path('/' + username + '/jobs');
-		// 	}
-		// 	else
-		// 		$scope.logindata.alert = "Error: Incorrect Authentication Information";
-		// });
-
-		
-
-		// if(user != null){
-		// 	$cookieStore.put("username", username);
-		// 	$cookieStore.put("password", password);
-		// 	$cookieStore.put("roleid", user.role);
-		// 	$cookieStore.put("authenticated", "true");
-		// 	alert(1);
-		// 	$location.path('/' + username + '/jobs');
-		// }
-		// else
-		// 	$scope.logindata.alert = "Error: Incorrect Authentication Information";
 	};
 
 	$scope.clearCookies = function(){
@@ -138,8 +83,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Variable related to the order of the job list
 	$scope.reverse = false;
 	//Variable related to the pending number showed in the subtitle
-	// $rootScope.pendingnum = "";
-	//Have to stor the badge number in local storage, otherwise it is incorrect after refresh in the job view page.
+	//Have to store the badge number in local storage, otherwise it is incorrect after refresh in the job view page.
 	localStorageService.set('pendingnum', "");
 	$rootScope.pendingnum = "";
 	$rootScope.badgelink = "/#/" + $scope.user.name + "/pendingjobs";
@@ -201,38 +145,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.gatherPending = function(){		
 		$rootScope.overview.query = "Pending";
 	};
-	//$http version
-	// Api.getJobByStaff($scope.user.id).then(function(response){
-	// 	$scope.jobs = response.data;
-	// });
-
-	// Api.getStaffByName($stateParams.username).then(function(response){
-	// 	alert(response.id);
-	// 	$scope.user = response;
-
-	// 	Api.getJobByStaff($scope.user.id).then(function(response){
-	// 		$scope.jobs = response.data;
-	// 	});
-
-	// 	// $scope.user = User.getUserByName($stateParams.username);
-	// 	// Api.getJobByStaff()
-	// 	// $scope.jobs = Jobs.all();
-	// 	$scope.orderProp = '';
-
-	// 	$scope.$logoff = Account;
-
-	// 	//function to go to overview page
-	// 	$scope.$overview = Account;
-	// });
-
-	// Api.getJobByStaff($scope.user.id).then(function(response){
-	// 	$scope.jobs = response.data;
-	// });
-
-	// // $scope.user = User.getUserByName($stateParams.username);
-	// // Api.getJobByStaff()
-	// // $scope.jobs = Jobs.all();
-	// $scope.orderProp = '';
 })
 
 .controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api){
@@ -254,7 +166,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.$overview = function(){
 		$location.path('/' + $cookieStore.get('user').name + '/jobs');
 	}
-	
+
 	//Account;
 
 	//Code which depends on the job variable
@@ -419,14 +331,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$scope.validNextStatsus = false;
 				}
 			};
-
-			// $scope.validNextStatsus = true;
-			//function to process a printer location, and other locations can't be selected.
-			// $scope.movetoNextPrintStatus = function(){
-			// 	if(!$scope.validNextPrintStatsus)
-			// 		return;
-
-			// };
 		}
 		//Add the assign job button for manager users
 		else{
@@ -599,8 +503,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		// $scope.processing = false;
 		//funciton to select printer location
 		$scope.selectedLocation = function(img, location){
-			// if($scope.processing)
-			// 	return;
 			$scope.selectedImg = img;
 			$scope.selectedImgSrc = location.src;
 			$scope.largePreviewText = location.name + " is not included in the design";
@@ -667,70 +569,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$scope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById($scope.currentPrintStatus + 1, localStorageService.get("printstatuses")).name;
 				}
 			}
-			// if($scope.printlogs.length == 0)
-			// 	$scope.validNextPrintStatsus = true;
-
-			// location.location.printlog;
 		};
 
 		$scope.gatherPending = function(){
 			Account.overview(false);
 			$rootScope.overview.query = "Pending";
 		};
-
-		// //function to process a printer location, and other locations can't be selected.
-		// $scope.movetoNext = function(){
-		// };
-
-		// $scope.printNN = function(){
-		// };
 	});
-
-	//Code to execute after the job is fetched
-	// $scope.$watch('job', function(){
-	// 	var job = $scope.job;
-	// 	alert(job.name);
-	// 	alert(job.facility_id);
-	// 	$scope.alert = $scope.job.name;
-	// });
-	
-	// if($scope.rolename != roles[3].name){
-	// 	$scope.NonManagerDiv = "/templates/" + NON_MANAGER_DIV + ".html";
-	// }
-	// else{
-	// 	Api.getData("staffs").query(function(data){
-	// 		$scope.preps = [];
-	// 		$scope.printers = [];
-	// 		angular.forEach(data, function(staff){
-	// 			if(staff.role_id = roles[0].id)
-	// 				$scope.preps.push(staff);
-	// 			else if(staff.role_id = roles[1].id)
-	// 				$scope.printers.push(staff);
-	// 		});
-	// 	});
-	// 	$scope.ManagerDiv = "/templates/" + MANAGER_DIV + ".html";
-	// 	$scope.assignee = {};
-	// 	$scope.assign = function(){
-	// 		if($scope.assignee.prep == undefined || $scope.assignee.printer == undefined){
-	// 			$scope.alert = "Incomplete Assignment";
-	// 		}
-	// 	}
-	// }
-	// if(user.role_id == roles[1].id){
-	// 	$scope.PrinterDiv = "/templates/" + PRINTER_DIV + ".html";
-	// }
-	
-	// //Tag to mark if a location is being printing. If so, the user can't select other printer location.
-
-	// //funciton to select printer location
-	// $scope.selectedLocation = function(img, location){
-
-	// 	$scope.selectedImg = img;
-	// 	$scope.selectedImgSrc = "/img/jobs/" + $stateParams.jobId + "/" + location + ".jpg";
-	// 	$scope.largePreviewText = location + " is not included in the design";
-	// }
-
-
 });
 
 var ROLES = ["Prep", "Printer", "QC", "Manager"];

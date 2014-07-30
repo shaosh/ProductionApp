@@ -508,24 +508,5 @@ angular.module('starter.services', ['LocalStorageModule'])
     };
 });
 
-// .factory('Previews', function() {
-// 	var jobs = [
-// 		{id: 554114, name: "names and numbers"},
-// 		{id: 554120, name: "cart-sizeup-test"},
-// 		{id: 554133, name: "gingerbreadman-test 2"},
-// 		{id: 554790, name: "franklin family"},
-// 		{id: 554803, name: "testingdevtest"},
-// 		{id: 554804, name: "flagtest"},
-// 		{id: 554810, name: "254"},
-// 		{id: 554814, name: "vidhyachrometest"},
-// 	];
-
-// 	return{
-// 		all: function(){
-// 			return jobs;
-// 		}
-// 	}
-// });
-
 
 var ROLES = ["Prep", "Printer", "QC", "Manager"];
