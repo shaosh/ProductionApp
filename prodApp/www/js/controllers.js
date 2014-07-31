@@ -61,11 +61,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, cssInjector, localStorageService, Helpers, Account, Api){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, cssInjector, localStorageService, Helpers, Account, Api){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
 	cssInjector.add('css/subheader.css');
-
+// $httpDefaultCache = $cacheFactory.get('$http');
+// if($httpDefaultCache.get('data/jobs.json') != undefined)
+// alert("after: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
 	$scope.user = $cookieStore.get("user");
 	$scope.rolename = $cookieStore.get("rolename");
 	$scope.orderProp = '';
@@ -155,7 +157,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	var roles = localStorageService.get("roles");
 	$rootScope.pendingnum = localStorageService.get('pendingnum');	
 	//Clear the overview.query
-	$rootScope.overview.query = undefined;
+	// $rootScope.overview = {};	
 
 	$scope.user = user;
 	$scope.rolename = $cookieStore.get("rolename");
@@ -165,9 +167,41 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Function to go to overview page
 	$scope.$overview = function(){
 		$location.path('/' + $cookieStore.get('user').name + '/jobs');
-	}
+	};
 
-	//Account;
+	//Code to check and parse $http cache
+	var $httpDefaultCache = $cacheFactory.get('$http');
+	var cachedJobs = $httpDefaultCache.get('data/jobs.json');
+	var dataarray = JSON.parse(cachedJobs[1]);
+
+	var jsonobj = JSON.parse(cachedJobs[1])[4];
+	// var jsonobj = JSON.parse("{\"id\": 554814,\"name\": \"vidhyachrometest\", \"facility_id\": 2,\"location\": [], \"staff\": [],\"log\": []}");
+	alert(JSON.stringify(jsonobj));
+	alert(dataarray);
+	dataarray.push(jsonobj);
+	alert(dataarray);
+	alert("before: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
+
+	cachedJobs[1] = JSON.stringify(dataarray)
+	// var newjson = [];
+	// for(var i = 0; i < cachedJobs.length; i++){
+	// 	if(i != 1){
+	// 		newjson.push(cachedJobs[i]);
+	// 	}
+	// 	else{
+	// 		newjson.push(JSON.stringify(dataarray));
+	// 	}
+	// 	// alert((JSON.parse(JSON.stringify(cachedJobs)))[i]);
+	// }
+	// alert(JSON.stringify(newjson));
+	// // $httpDefaultCache.remove('data/jobs.json');
+	// $httpDefaultCache.put('data/jobs.json', newjson);
+	$httpDefaultCache = $cacheFactory.get('$http');
+	alert("after: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
+	/*Code related to socket.io
+
+
+	*/
 
 	//Code which depends on the job variable
 	//Fetch the specific job based on its job id.

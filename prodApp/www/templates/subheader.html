@@ -2,7 +2,8 @@
 <h2 class="title">{{rolename}}: {{user.name}} 
     <button title="Pending Job Number" 
             class="badge" 
-            ng-class="{'pendingBadge': pendingnum > 0}" 
+            ng-class="{'pendingBadge': pendingnum > 0,
+                       'no-pendingBadge': pendingnum <= 0 || pendingnum == ''}" 
             style="color: black" 
             ng-click="gatherPending()">
         {{pendingnum}}

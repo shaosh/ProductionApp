@@ -3,3 +3,6 @@
 	text-decoration: none;
 }
 
+.no-pendingBadge{
+	display: none;
+}
