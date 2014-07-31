@@ -294,17 +294,18 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		incrementPendingnum: function(){
-			if(localStorageService.get('pendingnum') == "")
+			if(localStorageService.get('pendingnum') == "" || localStorageService.get('pendingnum') == null){
 				localStorageService.set('pendingnum', 0);
+			}
 			var pendingnum = localStorageService.get('pendingnum');
-			localStorageService.set('pendingnum', pendingnum + 1);
+			localStorageService.set('pendingnum', parseInt(pendingnum) + 1);
 		},
 
 		decrementPendingnum: function(){
 			var pendingnum = localStorageService.get("pendingnum");
-			if(pendingnum == "" || pendingnum == undefined)
+			if(pendingnum == "" || pendingnum == undefined || pendingnum == null)
 				return;
-			pendingnum--;
+			pendingnum = parseInt(pendingnum) - 1;
 			if(pendingnum == 0)
 				pendingnum = "";
 			localStorageService.set("pendingnum", pendingnum);
@@ -506,6 +507,39 @@ angular.module('starter.services', ['LocalStorageModule'])
             })
         }
     };
+})
+
+.factory('httpCache', function($http, $cacheFactory){
+	var $httpDefaultCache = $cacheFactory.get('$http');  
+	return{
+		add: function(url, element){
+			var cachedData = $httpDefaultCache.get(url);
+			if(cachedData == undefined)
+				return;
+			var data = JSON.parse(cachedData[1]);
+			data.push(element);
+			cachedData[1] = JSON.stringify(data);
+		}, 
+		//Type = 0: remove; Type = 1: replace
+		modify: function(url, element, type){
+			var cachedData = $httpDefaultCache.get(url);
+			if(cachedData == undefined)
+				return;
+			var data = JSON.parse(cachedData[1]);
+			var index = 0;
+			for(var i = 0; i < data.length; i++){
+				if(data[i].id == element.id){
+					index = i;
+					break;
+				}
+			}
+			if(type == 0)
+				data.splice(index, 1);
+			else
+				data.splice(index, 1, element);
+			cachedData[1] = JSON.stringify(data);
+		}
+	};
 });
 
 

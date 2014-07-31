@@ -61,7 +61,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, cssInjector, localStorageService, Helpers, Account, Api){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $http, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
 	cssInjector.add('css/subheader.css');
@@ -74,8 +74,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.isOverview = false;
 	$scope.$logoff = Account;
 	$scope.$overview = function(){
-		$rootScope.overview.query = ""
-	}
+		$rootScope.overview.query = "";
+	};
 
 	//Account;
 	//$scope.overview added for query to be updated from input
@@ -92,7 +92,34 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 	$scope.reverseOrder = function(){
 		$scope.reverse = !$scope.reverse;
-	}
+	};
+
+	//Test caching
+	// var $httpDefaultCache = $cacheFactory.get('$http');
+	// var cachedJobs = $httpDefaultCache.get('data/jobs.json');
+	// alert("before: " + JSON.parse(cachedJobs[1]).length);
+	var url = 'data/jobs.json';
+	//Socket.io listeners
+	//Assume the data is a json object of a new job to a specific facility
+	socket.on('job:received', function(data){
+		httpCache.add(url, data);
+		// alert("after: " + JSON.parse(cachedJobs[1]).length);		
+		if($scope.user.role_id == localStorageService.get('Manager')){
+			Helpers.incrementPendingnum();
+			$rootScope.pendingnum = localStorageService.get('pendingnum');
+			data.pending = "Pending";
+			$scope.jobs.push(data);
+		}
+	});
+	socket.on('job:broadcast', function(data){});
+	socket.on('job:changed', function(data){});
+	socket.on('job:staff:changed', function(data){});
+	socket.on('job:log:changed', function(data){});
+	socket.on('job:location:started', function(data){});
+	socket.on('job:location:changed', function(data){});
+	socket.on('job:location:complete', function(data){});
+	socket.on('job:complete', function(data){});
+	socket.on('job:authenticated', function(data){});	
 
 	Api.getData("jobs").query(function(data){
 		$scope.jobs = [];
@@ -149,7 +176,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api){
+.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
 	cssInjector.add('css/subheader.css');
@@ -169,39 +196,42 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$location.path('/' + $cookieStore.get('user').name + '/jobs');
 	};
 
-	//Code to check and parse $http cache
+	/*Code to check and parse $http cache
 	var $httpDefaultCache = $cacheFactory.get('$http');
 	var cachedJobs = $httpDefaultCache.get('data/jobs.json');
-	var dataarray = JSON.parse(cachedJobs[1]);
-
-	var jsonobj = JSON.parse(cachedJobs[1])[4];
-	// var jsonobj = JSON.parse("{\"id\": 554814,\"name\": \"vidhyachrometest\", \"facility_id\": 2,\"location\": [], \"staff\": [],\"log\": []}");
-	alert(JSON.stringify(jsonobj));
-	alert(dataarray);
-	dataarray.push(jsonobj);
-	alert(dataarray);
-	alert("before: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
-
-	cachedJobs[1] = JSON.stringify(dataarray)
-	// var newjson = [];
-	// for(var i = 0; i < cachedJobs.length; i++){
-	// 	if(i != 1){
-	// 		newjson.push(cachedJobs[i]);
-	// 	}
-	// 	else{
-	// 		newjson.push(JSON.stringify(dataarray));
-	// 	}
-	// 	// alert((JSON.parse(JSON.stringify(cachedJobs)))[i]);
-	// }
-	// alert(JSON.stringify(newjson));
-	// // $httpDefaultCache.remove('data/jobs.json');
-	// $httpDefaultCache.put('data/jobs.json', newjson);
-	$httpDefaultCache = $cacheFactory.get('$http');
-	alert("after: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
-	/*Code related to socket.io
-
-
+	alert("before: " + JSON.stringify(JSON.parse(cachedJobs[1])));
+	var jsonobj = JSON.parse("{\"id\": 554114,\"name\": \"vidhyachrometest\", \"facility_id\": 2,\"location\": [], \"staff\": [],\"log\": []}");
+	var url = 'data/jobs.json';
+	httpCache.add(url, jsonobj);
+	httpCache.modify(url, jsonobj, 1);
+	alert("after: " + JSON.stringify(JSON.parse($cacheFactory.get('$http').get('data/jobs.json')[1])));
 	*/
+
+	//Test caching
+	var $httpDefaultCache = $cacheFactory.get('$http');
+	var cachedJobs = $httpDefaultCache.get('data/jobs.json');
+	alert("before: " + JSON.parse(cachedJobs[1]).length);
+	//Socket.io listeners
+	var url = 'data/jobs.json';
+	//Assume the data is a json object of a new job to a specific facility
+	socket.on('job:received', function(data){
+		// alert("Receive Job: " + JSON.stringify(data));
+		httpCache.add(url, data);
+		alert("after: " + JSON.parse(cachedJobs[1]).length);
+		if(user.role_id == localStorageService.get('Manager')){
+			Helpers.incrementPendingnum();
+			$rootScope.pendingnum = localStorageService.get('pendingnum');
+		}
+	});
+	// socket.on('job:broadcast', function(data){});
+	// socket.on('job:changed', function(data){});
+	// socket.on('job:staff:changed', function(data){});
+	// socket.on('job:log:changed', function(data){});
+	// socket.on('job:location:started', function(data){});
+	// socket.on('job:location:changed', function(data){});
+	// socket.on('job:location:complete', function(data){});
+	// socket.on('job:complete', function(data){});
+	// socket.on('job:authenticated', function(data){});	
 
 	//Code which depends on the job variable
 	//Fetch the specific job based on its job id.
