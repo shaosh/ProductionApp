@@ -118,6 +118,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			localStorageService.set("QC_Completed_Log", 6);
 
 			//Print Log
+			localStorageService.set("Press_Started_PrintLog", 3);
 			localStorageService.set("Printer_Completed_Regular_PrintLog", 4);
 			localStorageService.set("QC_Completed_Regular_PrintLog", 5);
 			localStorageService.set("Printer_Completed_NN_PrintLog", 7);
@@ -372,6 +373,27 @@ angular.module('starter.services', ['LocalStorageModule'])
 					return;
 				}
 			}
+		},
+
+		addPrintLog: function(log, joblist){
+			var jobid = log.job_id;
+			var locationid = log.location_id;
+			for(var i = 0; i < joblist.length; i++){
+				if(joblist[i].id == jobid){
+					for(var j = 0; j < joblist[i].location.length; j++){
+						if(joblist[i].location[j].location_id == locationid){
+							if(locationid != localStorageService.get("NamesNumbers") && joblist[i].location[j].printlog.length == log.print_status_id){
+								joblist[i].location[j].printlog.push(log);
+								return;
+							}
+							else if(locationid == localStorageService.get("NamesNumbers") && joblist[i].location[j].printlog.length == log.print_status_id - localStorageService.get("QC_Regular_PrintLog_Count")){
+								joblist[i].location[j].printlog.push(log);
+								return;
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 })
@@ -583,8 +605,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			data.push(element);
 			cachedData[1] = JSON.stringify(data);
 		}, 
-		//Type = 0: remove; Type = 1: replace
-		modify: function(url, element, type){
+		update: function(url, element){
 			var cachedData = $httpDefaultCache.get(url);
 			if(cachedData == undefined)
 				return;
@@ -596,12 +617,26 @@ angular.module('starter.services', ['LocalStorageModule'])
 					break;
 				}
 			}
-			if(type == 0)
-				data.splice(index, 1);
-			else
-				data.splice(index, 1, element);
+			data.splice(index, 1, element);
 			cachedData[1] = JSON.stringify(data);
 		}, 
+		//Remove by id, not modify which is
+		remove: function(url, id){
+			var cachedData = $httpDefaultCache.get(url);
+			if(cachedData == undefined)
+				return;
+			var data = JSON.parse(cachedData[1]);
+			var index = 0;
+			for(var i = 0; i < data.length; i++){
+				if(data[i].id == id){
+					index = i;
+					break;
+				}
+			}
+			data.splice(index, 1);
+			cachedData[1] = JSON.stringify(data);
+		},
+
 		get: function(url){
 			var cachedData = $httpDefaultCache.get(url);
 			if(cachedData == undefined)

@@ -127,13 +127,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if(!Helpers.isJobinJoblist(data.id, $rootScope.jobs))
 			return;
 		// $location.path('/' + $cookieStore.get('user').name + '/jobs/' + data.id);
-		httpCache.modify(url, data, 1);
+		httpCache.update(url, data);
 		alert("The current job has been changed.");
 		//If the user is no longer a staff for this job, remove it and update the pending number
 		if((($scope.user.role_id == localStorageService.get('Prep') || $scope.user.role_id == localStorageService.get('Printer')) && !Helpers.isStaffinJob($scope.user, $rootScope.job)) ||
 		   (($scope.user.role_id == localStorageService.get('Manager') || $scope.user.role_id == localStorageService.get('QC')) && !Helpers.facilityIdCompare($scope.user, data))	
 		){
-			alert("You have been removed from the job " + data.id + ".");
+			alert("You have been removed from the Job " + data.id + ".");
 			var job = Helpers.getObjectById(data.id, $rootScope.jobs);
 			if(job.pending == "Pending"){
 				Helpers.decrementPendingnum();
@@ -176,7 +176,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				data.job.pending = "Pending";
 				$rootScope.jobs.push(data.job);
 				localStorageService.set("joblist", $rootScope.jobs);
-				alert("You have been assigned to a new job: " + data.job.id +".");
+				alert("You have been assigned to a new Job: " + data.job.id +".");
 			}
 			else if(data.staff_id == $scope.user.id && data.add == false){
 				var job = Helpers.getObjectById(data.job.id, $rootScope.jobs);
@@ -190,18 +190,19 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				}				
 				Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
 				localStorageService.set("joblist", $rootScope.jobs);
-				alert("You have been removed from the job " + data.job.id + ".");
+				alert("You have been removed from the Job " + data.job.id + ".");
 				if($rootScope.jobId == data.job.id)
 					$location.path('/' + $cookieStore.get('user').name + '/jobs');
 			}
 		}
 	});
+
 	//data: log:{id:"", job_id:"", job_status_id:""}
-	socket.on('job:log:changed', function(data){
-		Helpers.addJobLog(data, $rootScope.jobs);
+	socket.on('job:log:changed', function(data){		
 		if($scope.user.role_id == localStorageService.get("Manager")){
-			// Helpers.addJobLog(data, $rootScope.jobs);
-			alert("The job " + data.job_id + " is moved to status " + data.job_status_id + ".");
+			Helpers.addJobLog(data, $rootScope.jobs);
+			var logname = Helpers.getObjectById(data.job_status_id, localStorageService.get("logstatuses")).name;
+			alert("The Job " + data.job_id + " is moved to Status " + logname + ".");
 		}
 		//Actually the prep does not need to do anything.
 		//All the logs will be added after he clicks the button and before he informs the server.
@@ -217,6 +218,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		//It is better if the server can also send the job if the log is printer_started
 		else{
 			if(data.job_status_id == localStorageService.get('Printer_Started_Log')){
+				//The job item is fetched from the server, which is actually from the $http cache.
 				Api.getData("jobs").query(function(jobs){
 					var job = null;
 					for(var i = 0; i < jobs.length; i++){
@@ -226,18 +228,60 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					}
 					if(job != null){
 						alert("There is a new job for QC: " + job.id);
+						Helpers.incrementPendingnum();
+						$rootScope.pendingnum = localStorageService.get('pendingnum');
 						job.pending = "Pending";
 						$rootScope.jobs.push(job);
+						localStorageService.set("joblist", $rootScope.jobs);
 					}
 				});
 			}
+			else if(data.job_status_id == localStorageService.get('Printer_Completed_Log')){
+				Helpers.addJobLog(data, $rootScope.jobs);
+			}
 		}
 	});
-	socket.on('job:location:started', function(data){});
-	socket.on('job:location:changed', function(data){});
-	socket.on('job:location:complete', function(data){});
-	socket.on('job:complete', function(data){});
-	socket.on('job:authenticated', function(data){});	
+	//Data structure(location object): location:{id:"", job_id:"", location_id:"", printlog:""}
+	socket.on('job:location:started', function(data){
+		if($scope.user.role_id == localStorageService.get("Manager")){
+			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
+			alert("The Location " + locationname + " of Job " + data.job_id + " is started." );
+		}
+	});
+	//Data structure(printlog object): location:{id:"", job_id:"", location_id:"", print_status_id:""}
+	socket.on('job:location:changed', function(data){
+		if($scope.user.role_id == localStorageService.get("Manager")){
+			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
+			var printlogname = Helpers.getObjectById(data.print_status_id, localStorageService.get("printstatuses")).name;
+			alert("The Location " + locationname + " of Job " + data.job_id + " is moved to status " + printlogname + "." );
+			Helpers.addPrintLog(data, $rootScope.jobs);
+		}
+		else if($scope.user.role_id == localStorageService.get("QC")){
+			if(data.print_status_id == localStorageService.get("Press_Started_PrintLog")){
+				var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
+				var printlogname = Helpers.getObjectById(data.print_status_id, localStorageService.get("printstatuses")).name;
+				alert("The Location " + locationname + " of Job " + data.job_id + " is moved to status " + printlogname + "." );
+			}
+			Helpers.addPrintLog(data, $rootScope.jobs);
+		}
+	});
+	socket.on('job:location:complete', function(data){
+		if($scope.user.role_id == localStorageService.get("Manager")){
+			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
+			alert("The Location " + locationname + " of Job " + data.job_id + " is completed." );
+		}
+	});
+	//Assume the data is just the job id
+	socket.on('job:complete', function(data){
+		httpCache.remove(url, data);
+		if($scope.user.role_id == localStorageService.get("Manager") || $scope.user.role_id == localStorageService.get("Printer")){
+			if($scope.user.role_id == localStorageService.get("Manager")){
+				alert("The Job "  + data + " is completed.");
+			}
+			Helpers.removeItemFromList(data, $rootScope.jobs);
+		}
+	});
+	socket.on('staff:authenticated', function(data){});	
 
 	Api.getData("jobs").query(function(data){
 		$rootScope.jobs = [];
