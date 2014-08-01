@@ -7,7 +7,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$cookieStore.get("password") != undefined &&
 		$cookieStore.get("authenticated") == "true"
 	){
-		$location.path('/' + $cookieStore.get("user").name + '/jobs');
+		// $location.path('/' + $cookieStore.get("user").name + '/jobs');
 	}
 
 	cssInjector.removeAll();
@@ -61,7 +61,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $http, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $http, $location, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
 	cssInjector.add('css/subheader.css');
@@ -107,13 +107,56 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if($scope.user.role_id == localStorageService.get('Manager')){
 			Helpers.incrementPendingnum();
 			$rootScope.pendingnum = localStorageService.get('pendingnum');
-			data.pending = "Pending";
-			$scope.jobs.push(data);
+			// data.pending = "Pending";
+			$rootScope.jobs.push(data);
+			// localStorageService.set("joblist", $rootScope.jobs);
 		}
 	});
-	socket.on('job:broadcast', function(data){});
-	socket.on('job:changed', function(data){});
-	socket.on('job:staff:changed', function(data){});
+	//Need the server to include the job id in the data
+	//Prefered structure: data: { job_id: "", message: ""}
+	//This listener depends on $rootScope.jobs. In the jobview page, if the page is refreshed, the data
+	//in the $rootScope.jobs is gone. So the user will not be able to receive the data. 
+	socket.on('job:broadcast', function(data){
+		if($scope.user.role_id != localStorageService.get('QC') &&
+		   	Helpers.isJobinJoblist(data.job_id, $rootScope.jobs))
+			alert(data.message);
+	});
+
+	//Need the server to include the json object of the job
+	socket.on('job:changed', function(data){
+		httpCache.modify(url, data, 1);
+	});
+
+	//Prefered the updated job to be sent with staff id
+	//Prefered data structure:
+	//data: {job: "", staff_id: "", add:"true/false"}
+	socket.on('job:staff:changed', function(data){
+		if($scope.user.role_id == localStorageService.get('Prep') || 
+		   $scope.user.role_id == localStorageService.get('Printer')){
+			if(data.staff_id == $scope.user.id && data.add == true){
+				Helpers.incrementPendingnum();
+				$rootScope.pendingnum = localStorageService.get('pendingnum');
+				data.job.pending = "Pending";
+				$rootScope.jobs.push(data.job);
+				alert("You have been assigned to a new job.\nThe job ID is: " + data.job.id +".");
+			}
+			else if(data.staff_id == $scope.user.id && data.add == false){
+				var job = Helpers.getObjectById(data.job.id, $rootScope.jobs);
+				// alert(JSON.stringify(job));
+				// alert(job.pending);
+				if(job == null)
+					return;
+				if(job.pending == "Pending"){
+					Helpers.decrementPendingnum();
+					$rootScope.pendingnum = localStorageService.get('pendingnum');
+				}				
+				Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
+				alert("You have been removed from the job " + data.job.id + ".");
+				if($rootScope.jobId == data.job.id)
+					$location.path('/' + $cookieStore.get('user').name + '/jobs');
+			}
+		}
+	});
 	socket.on('job:log:changed', function(data){});
 	socket.on('job:location:started', function(data){});
 	socket.on('job:location:changed', function(data){});
@@ -122,7 +165,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	socket.on('job:authenticated', function(data){});	
 
 	Api.getData("jobs").query(function(data){
-		$scope.jobs = [];
+		$rootScope.jobs = [];
 		angular.forEach(data, function(job){
 			if($scope.user.role_id == localStorageService.get("QC") || $scope.user.role_id == localStorageService.get("Manager")){
 				if(Helpers.facilityIdCompare($scope.user, job)){
@@ -136,10 +179,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 					//Add the job for the manager
 					if($scope.user.role_id == localStorageService.get("Manager"))
-						$scope.jobs.push(job);
+						$rootScope.jobs.push(job);
 					//Add the job for the QC only when the job is ready for him
 					else if($scope.user.role_id == localStorageService.get("QC") && Helpers.isJobReadyForQC(job))
-						$scope.jobs.push(job);
+						$rootScope.jobs.push(job);
 				}
 			}
 			else{
@@ -151,7 +194,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						job.pending = "Pending";
 					else
 						job.pending = "";
-					$scope.jobs.push(job);
+					$rootScope.jobs.push(job);
 				}
 			}	
 
@@ -169,7 +212,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				$rootScope.pendingnum = localStorageService.get('pendingnum');
 			}			
 		});
-		
+		//Store the jobs list into the local storage, otherwise the jobs will be null after refresh the job view page.
+		localStorageService.set("joblist", $rootScope.jobs);
 	});
 	$scope.gatherPending = function(){		
 		$rootScope.overview.query = "Pending";
@@ -195,6 +239,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.$overview = function(){
 		$location.path('/' + $cookieStore.get('user').name + '/jobs');
 	};
+	if($rootScope.jobs == undefined || $rootScope.jobs == null){
+		$rootScope.jobs = localStorageService.get("joblist");
+	}
+
+	//This rootScope variable is specifically for the socket listener to get to know which page the app is in.
+	$rootScope.jobId =  $stateParams.jobId;
 
 	/*Code to check and parse $http cache
 	var $httpDefaultCache = $cacheFactory.get('$http');
@@ -208,21 +258,27 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	*/
 
 	//Test caching
-	var $httpDefaultCache = $cacheFactory.get('$http');
-	var cachedJobs = $httpDefaultCache.get('data/jobs.json');
-	alert("before: " + JSON.parse(cachedJobs[1]).length);
+	// var $httpDefaultCache = $cacheFactory.get('$http');
+	// var cachedJobs = $httpDefaultCache.get('data/jobs.json');
+	// alert("before: " + JSON.parse(cachedJobs[1]).length);
 	//Socket.io listeners
-	var url = 'data/jobs.json';
+	// var url = 'data/jobs.json';
+	// $rootScope.jobs = httpCache.get(url);
+
+
 	//Assume the data is a json object of a new job to a specific facility
-	socket.on('job:received', function(data){
-		// alert("Receive Job: " + JSON.stringify(data));
-		httpCache.add(url, data);
-		alert("after: " + JSON.parse(cachedJobs[1]).length);
-		if(user.role_id == localStorageService.get('Manager')){
-			Helpers.incrementPendingnum();
-			$rootScope.pendingnum = localStorageService.get('pendingnum');
-		}
-	});
+	//job:received is defined in overview page. It is still working when the app is in the job view page. 
+	// socket.on('job:received', function(data){
+	// 	alert("Receive Job: " + JSON.stringify(data));
+	// 	httpCache.add(url, data);
+	// 	alert("after: " + JSON.parse(cachedJobs[1]).length);
+	// 	if(user.role_id == localStorageService.get('Manager')){
+	// 		Helpers.incrementPendingnum();
+	// 		$rootScope.pendingnum = localStorageService.get('pendingnum');
+	// 	}
+	// });
+
+
 	// socket.on('job:broadcast', function(data){});
 	// socket.on('job:changed', function(data){});
 	// socket.on('job:staff:changed', function(data){});

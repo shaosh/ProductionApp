@@ -165,6 +165,15 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
+		//Find if the job is in the job list
+		isJobinJoblist: function(jobid, joblist){
+			for(var i = 0; i < joblist.length; i++){
+				if(joblist[i].id == jobid)
+					return true;
+			}
+			return false;
+		},
+
 		//Traverse the print log of every print location, if any one has its printing complete, it is ready for QC
 		isJobReadyForQC: function(job){
 			var locations = job.location;
@@ -207,6 +216,19 @@ angular.module('starter.services', ['LocalStorageModule'])
 					return true;
 			}
 
+		},
+
+		//Function to remove an item from the list based on id
+		removeItemFromList: function(id, list){
+			var index = -1;
+			for(var i = 0; i < list.length; i++){
+				if(list[i].id == id){
+					index = i;
+					break;
+				}
+			}
+			if(index > -1)
+				list.splice(index, 1);
 		},
 
 		//getStaffByID from local array
@@ -293,6 +315,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return true;
 		},
 
+		//Functions to update the number of the pending num in local storage. 
 		incrementPendingnum: function(){
 			if(localStorageService.get('pendingnum') == "" || localStorageService.get('pendingnum') == null){
 				localStorageService.set('pendingnum', 0);
@@ -538,6 +561,12 @@ angular.module('starter.services', ['LocalStorageModule'])
 			else
 				data.splice(index, 1, element);
 			cachedData[1] = JSON.stringify(data);
+		}, 
+		get: function(url){
+			var cachedData = $httpDefaultCache.get(url);
+			if(cachedData == undefined)
+				return null;
+			return JSON.parse(cachedData[1]);
 		}
 	};
 });

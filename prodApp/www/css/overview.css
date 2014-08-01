@@ -21,6 +21,7 @@ img {
 .item .badge{
 	background-color: #9CD429;
 	color: #000;
+	border: 1px solid #51B419;
 }
 
 #reversebtn{

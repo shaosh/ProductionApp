@@ -18,7 +18,9 @@
     <script src="cordova.js"></script>
 
     <!-- your app's js -->
-    <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>  <!--js for socket.io-->
+    <!-- <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script> --> <!--js for socket.io-->
+    <!--Copy the socket.io.js to local, otherwise the page loading might be held if the socket server is not running-->
+    <script src="js/socket.io.js"></script>
     <script src="js/app.js"></script>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="js/angular-css-injector.min.js"></script>
