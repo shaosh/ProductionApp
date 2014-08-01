@@ -174,6 +174,19 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
+		isJobPending: function(user, job){
+			if(user.role_id == localStorageService.get("Manager") && job.log.length == localStorageService.get("Manager_Pending_Log_Count"))
+				return "Pending";
+			else if(user.role_id == localStorageService.get("QC") && this.isJobReadyForQC(job))
+				return "Pending";
+			else if(user.role_id == localStorageService.get("Prep") && job.log.length == localStorageService.get("Prep_Pending_Log_Count"))
+				return "Pending";
+			else if(user.role_id == localStorageService.get("Printer") && job.log.length == localStorageService.get("Printer_Pending_Log_Count"))
+				return "Pending";
+			else
+				return "";
+		},
+
 		//Traverse the print log of every print location, if any one has its printing complete, it is ready for QC
 		isJobReadyForQC: function(job){
 			var locations = job.location;
@@ -232,8 +245,10 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		replaceItemFromList: function(element, list){
+			alert(1);
 			var index = -1;
 			for(var i = 0; i < list.length; i++){
+				alert(i);
 				if(list[i].id == element.id){
 					index = i;
 					break;
