@@ -431,7 +431,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$scope.facility_name = Helpers.getObjectById($rootScope.job.facility_id, localStorageService.get("facilities")).name;
 
 		//Generate job logs
-		$scope.joblogs = [];
+		$rootScope.joblogs = [];
 		for(var i = 0; i < $rootScope.job.log.length; i++){
 			var logname = Helpers.getObjectById($rootScope.job.log[i].job_status_id, localStorageService.get("logstatuses")).name;
 			var logicon = "";
@@ -442,7 +442,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			else
 				logicon = "ion-arrow-right-a";
 
-			$scope.joblogs.push({
+			$rootScope.joblogs.push({
 				"name": logname,
 				"icon": logicon
 			});
@@ -469,18 +469,18 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$scope.currentStatus = 0;
 
 			//If the job is already started, how to determine the current status of the job
-			if($scope.joblogs.length >= logtextlist[0].id){
+			if($rootScope.joblogs.length >= logtextlist[0].id){
 				for(var i = 0; i < logtextlist.length; i++){
 					var logExisted = false;
 					//Find which log of the user is not existed
-					for(var j = 0; j < $scope.joblogs.length; j++){
-						if($scope.joblogs[j].name == logtextlist[i].name){
+					for(var j = 0; j < $rootScope.joblogs.length; j++){
+						if($rootScope.joblogs[j].name == logtextlist[i].name){
 							logExisted = true;
 							$scope.currentStatus = logtextlist[i].id;
 						}
 					}
 					//Find out which status is the next status
-					if(!logExisted && $scope.joblogs.length == logtextlist[i].id){
+					if(!logExisted && $rootScope.joblogs.length == logtextlist[i].id){
 						if(user.role_id == localStorageService.get("Prep")){
 							$scope.nextStatusText = "Move to Next Status: " + logtextlist[i].name;
 							//Not change the value of currentStatus here
@@ -529,20 +529,20 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				//Seems the length==5 or 6 will not be invoked here
 				// if($scope.joblogs.length == 3 || $scope.joblogs.length == 5)
 				//The log to be added is Prep/Printer Complete
-				if($scope.joblogs.length == localStorageService.get("Prep_Completed_Log") || $scope.joblogs.length == localStorageService.get("Printer_Completed_Log"))
+				if($rootScope.joblogs.length == localStorageService.get("Prep_Completed_Log") || $rootScope.joblogs.length == localStorageService.get("Printer_Completed_Log"))
 					logicon = "ion-checkmark";
-				else if($scope.joblogs.length == localStorageService.get("logstatuses").length - 1)//6)
+				else if($rootScope.joblogs.length == localStorageService.get("logstatuses").length - 1)//6)
 					logicon = "ion-checkmark-circled";
 				else
 					logicon = "ion-arrow-right-a";
 
-				$scope.joblogs.push({
+				$rootScope.joblogs.push({
 					"name": logtextlist[$scope.currentStatus].name,
 					"icon": logicon
 				});
 
-				for(var i = 0; i < $scope.joblogs.length - 1; i++){
-					$scope.joblogs[i].icon = "ion-checkmark";
+				for(var i = 0; i < $rootScope.joblogs.length - 1; i++){
+					$rootScope.joblogs[i].icon = "ion-checkmark";
 				}
 
 				$scope.currentStatus++;
@@ -621,7 +621,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						var logstatuses = localStorageService.get("logstatuses");
 						var logname = logstatuses[localStorageService.get("Manager_Completed_Log")].name;
 						var logicon = "ion-checkmark";
-						$scope.joblogs.push({
+						$rootScope.joblogs.push({
 							"name": logname,
 							"icon": logicon
 						});
@@ -683,7 +683,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					if(Helpers.checkPrintingComplete($rootScope.job, user.role_id, $scope.currentLocationID)){
 						$scope.currentStatus++;
 						$scope.nextStatusText = Helpers.getObjectById($scope.currentStatus, localStorageService.get("logstatuses")).name;
-						$scope.joblogs.push({
+						$rootScope.joblogs.push({
 							"name": $scope.nextStatusText,
 							"icon": logicon
 						});
@@ -705,12 +705,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						if(Helpers.checkPrintingComplete($rootScope.job, user.role_id, $scope.currentLocationID)){
 							$scope.currentStatus++;
 							$scope.nextStatusText = Helpers.getObjectById($scope.currentStatus, localStorageService.get("logstatuses")).name;
-							$scope.joblogs.push({
+							$rootScope.joblogs.push({
 								"name": $scope.nextStatusText,
 								"icon": logicon
 							});
-							for(var i = 0; i < $scope.joblogs.length - 1; i++){
-								$scope.joblogs[i].icon = "ion-checkmark";
+							for(var i = 0; i < $rootScope.joblogs.length - 1; i++){
+								$rootScope.joblogs[i].icon = "ion-checkmark";
 							}
 						}
 					}
@@ -718,7 +718,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				else{
 					$scope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById($scope.currentPrintStatus + 1, localStorageService.get("printstatuses")).name;
 				}
-				$scope.printlogs.push({
+				$rootScope.printlogs.push({
 					"name": Helpers.getObjectById($scope.currentPrintStatus, localStorageService.get("printstatuses")).name,
 					"icon": logicon
 				});
@@ -726,7 +726,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				if($scope.nextStatusText == PRINTING_NOT_STARTED){
 					$scope.currentStatus++;
 					$scope.nextStatusText = Helpers.getObjectById($scope.currentStatus, localStorageService.get("logstatuses")).name;
-					$scope.joblogs.push({
+					$rootScope.joblogs.push({
 						"name": $scope.nextStatusText,
 						"icon": "ion-arrow-right-a"
 					});
@@ -748,7 +748,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$scope.selectedImgSrc = location.src;
 			$scope.largePreviewText = location.name + " is not included in the design";
 			$scope.largePreviewName = location.name;
-			$scope.printlogs = [];
+			$rootScope.printlogs = [];
 			$scope.validNextPrintStatsus = true;
 			$scope.currentPrintStatus = -1;
 			$scope.currentLocationID = location.location.location_id;
@@ -789,14 +789,14 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						$scope.nextPrintStatusText = PRINTING_NOT_READY;
 					}
 				}
-				$scope.printlogs.push({
+				$rootScope.printlogs.push({
 					"name": Helpers.getObjectById(printlog.print_status_id, localStorageService.get("printstatuses")).name,
 					"icon": logicon
 				});
 			});
 
 			//Set the first print status when there is no printlog
-			if($scope.printlogs.length == 0){
+			if($rootScope.printlogs.length == 0){
 				if(user.role_id == localStorageService.get("QC")){
 					$scope.validNextPrintStatsus = false;
 					$scope.nextPrintStatusText = PRINTING_NOT_READY;
