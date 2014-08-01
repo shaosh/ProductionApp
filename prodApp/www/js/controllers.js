@@ -61,7 +61,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $http, $location, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $http, $location, $state, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
 	cssInjector.add('css/subheader.css');
@@ -124,24 +124,49 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 	//Need the server to include the json object of the job
 	socket.on('job:changed', function(data){
+		if(!Helpers.isJobinJoblist(data.id, $rootScope.jobs))
+			return;
 		// $location.path('/' + $cookieStore.get('user').name + '/jobs/' + data.id);
 		httpCache.modify(url, data, 1);
-		// data.pending = Helpers.isJobPending($scope.user, data);
-		// Helpers.replaceItemFromList(data, $rootScope.jobs);
-
-		// if($rootScope.jobId == data.id){
-		// 	$rootScope.job = data;
-		// 	alert("The current job is changed.\nThe page will be reloaded.");
-		// 	// $location.path('/' + $cookieStore.get('user').name + '/jobs/' + data.id);
-		// 	// $route.reload();
-		// }
-		// else
+		alert("The current job has been changed.");
+		//If the user is no longer a staff for this job, remove it and update the pending number
+		if((($scope.user.role_id == localStorageService.get('Prep') || $scope.user.role_id == localStorageService.get('Printer')) && !Helpers.isStaffinJob($scope.user, $rootScope.job)) ||
+		   (($scope.user.role_id == localStorageService.get('Manager') || $scope.user.role_id == localStorageService.get('QC')) && !Helpers.facilityIdCompare($scope.user, data))	
+		){
+			var job = Helpers.getObjectById(data.id, $rootScope.jobs);
+			if(job.pending == "Pending"){
+				Helpers.decrementPendingnum();
+				$rootScope.pendingnum = localStorageService.get('pendingnum');					
+			}				
+			Helpers.removeItemFromList(data.id, $rootScope.jobs);
+			localStorageService.set("joblist", $rootScope.jobs);
+			if($rootScope.jobId == data.id){
+				$location.path('/' + $cookieStore.get('user').name + '/jobs');
+			}
+		}
+		//If the user is still a staff of the job, update the pending number and job list. May reload the jobview page. 
+		else{
+			data.pending = Helpers.isJobPending($scope.user, data);
+			if(data.pending == "Pending" && $rootScope.job.pending == "")
+				Helpers.incrementPendingnum();
+			else if(data.pending == "" && $rootScope.job.pending == "Pending")
+				Helpers.decrementPendingnum();
+			Helpers.replaceItemFromList(data, $rootScope.jobs);
+			localStorageService.set("joblist", $rootScope.jobs);
+			//Now just reload the whole page, will change to update partial page later
+			if($rootScope.jobId == data.id){
+				$rootScope.job = data;
+				$state.go($state.$current, null, {reload: true});
+			}
+		}
 	});
 
 	//Prefered the updated job to be sent with staff id
 	//Prefered data structure:
 	//data: {job: "", staff_id: "", add:"true/false"}
 	socket.on('job:staff:changed', function(data){
+		if(!Helpers.isJobinJoblist(data.job.id, $rootScope.jobs))
+			return;
 		if($scope.user.role_id == localStorageService.get('Prep') || 
 		   $scope.user.role_id == localStorageService.get('Printer')){
 			if(data.staff_id == $scope.user.id && data.add == true){
@@ -149,11 +174,11 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				$rootScope.pendingnum = localStorageService.get('pendingnum');
 				data.job.pending = "Pending";
 				$rootScope.jobs.push(data.job);
+				localStorageService.set("joblist", $rootScope.jobs);
 				alert("You have been assigned to a new job.\nThe job ID is: " + data.job.id +".");
 			}
 			else if(data.staff_id == $scope.user.id && data.add == false){
 				var job = Helpers.getObjectById(data.job.id, $rootScope.jobs);
-				alert(job.pending);
 				// alert(JSON.stringify(job));
 				// alert(job.pending);
 				if(job == null)
@@ -170,7 +195,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 		}
 	});
-	socket.on('job:log:changed', function(data){});
+	socket.on('job:log:changed', function(data){
+
+	});
 	socket.on('job:location:started', function(data){});
 	socket.on('job:location:changed', function(data){});
 	socket.on('job:location:complete', function(data){});

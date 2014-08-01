@@ -245,7 +245,6 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		replaceItemFromList: function(element, list){
-			alert(1);
 			var index = -1;
 			for(var i = 0; i < list.length; i++){
 				alert(i);
@@ -254,7 +253,6 @@ angular.module('starter.services', ['LocalStorageModule'])
 					break;
 				}
 			}
-			alert(index);
 			if(index > -1)
 				list.splice(index, 1, element);
 		},
