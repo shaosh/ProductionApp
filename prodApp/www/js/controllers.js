@@ -133,6 +133,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if((($scope.user.role_id == localStorageService.get('Prep') || $scope.user.role_id == localStorageService.get('Printer')) && !Helpers.isStaffinJob($scope.user, $rootScope.job)) ||
 		   (($scope.user.role_id == localStorageService.get('Manager') || $scope.user.role_id == localStorageService.get('QC')) && !Helpers.facilityIdCompare($scope.user, data))	
 		){
+			alert("You have been removed from the job " + data.id + ".");
 			var job = Helpers.getObjectById(data.id, $rootScope.jobs);
 			if(job.pending == "Pending"){
 				Helpers.decrementPendingnum();
@@ -175,7 +176,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				data.job.pending = "Pending";
 				$rootScope.jobs.push(data.job);
 				localStorageService.set("joblist", $rootScope.jobs);
-				alert("You have been assigned to a new job.\nThe job ID is: " + data.job.id +".");
+				alert("You have been assigned to a new job: " + data.job.id +".");
 			}
 			else if(data.staff_id == $scope.user.id && data.add == false){
 				var job = Helpers.getObjectById(data.job.id, $rootScope.jobs);
@@ -195,8 +196,42 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 		}
 	});
+	//data: log:{id:"", job_id:"", job_status_id:""}
 	socket.on('job:log:changed', function(data){
-
+		Helpers.addJobLog(data, $rootScope.jobs);
+		if($scope.user.role_id == localStorageService.get("Manager")){
+			// Helpers.addJobLog(data, $rootScope.jobs);
+			alert("The job " + data.job_id + " is moved to status " + data.job_status_id + ".");
+		}
+		//Actually the prep does not need to do anything.
+		//All the logs will be added after he clicks the button and before he informs the server.
+		//The job will be added to the overview in the event job:staff:changed.
+		//The job will be removed after he clicks the burn screen and before he informs the server.
+		else if($scope.user.role_id == localStorageService.get("Prep")){
+			// if(data.job_status_id == localStorageService.get('Manager_Completed_Log')){}
+			// else if(data.job_status_id == localStorageService.get('Prep_Completed_Log')){}
+		}
+		//The situation of the Printer is quite similar to that of the Prep
+		else if($scope.user.role_id == localStorageService.get("Printer")){
+		}
+		//It is better if the server can also send the job if the log is printer_started
+		else{
+			if(data.job_status_id == localStorageService.get('Printer_Started_Log')){
+				Api.getData("jobs").query(function(jobs){
+					var job = null;
+					for(var i = 0; i < jobs.length; i++){
+						if(jobs[i].id == data.job_id){
+							job = jobs[i];
+						}
+					}
+					if(job != null){
+						alert("There is a new job for QC: " + job.id);
+						job.pending = "Pending";
+						$rootScope.jobs.push(job);
+					}
+				});
+			}
+		}
 	});
 	socket.on('job:location:started', function(data){});
 	socket.on('job:location:changed', function(data){});
@@ -215,8 +250,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					//Add the job for the manager
 					if($scope.user.role_id == localStorageService.get("Manager"))
 						$rootScope.jobs.push(job);
-					//Add the job for the QC only when the job is ready for him
-					else if($scope.user.role_id == localStorageService.get("QC") && Helpers.isJobReadyForQC(job))
+					//Add the job for the QC only when the job is ready for him. According to Cory, a job should be added to the QC's job list if it is started printing
+					else if($scope.user.role_id == localStorageService.get("QC") && job.log.length == localStorageService.get('Printer_Started_Log_Count')) //Helpers.isJobReadyForQC(job))
 						$rootScope.jobs.push(job);
 				}
 			}

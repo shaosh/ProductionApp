@@ -113,6 +113,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			//Job log
 			localStorageService.set("Manager_Completed_Log", 1);
 			localStorageService.set("Prep_Completed_Log", 3);
+			localStorageService.set("Printer_Started_Log", 4);
 			localStorageService.set("Printer_Completed_Log", 5);
 			localStorageService.set("QC_Completed_Log", 6);
 
@@ -126,6 +127,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			localStorageService.set("Manager_Pending_Log_Count", 1);
 			localStorageService.set("Prep_Pending_Log_Count", 2);
 			localStorageService.set("Printer_Pending_Log_Count", 4);
+			localStorageService.set("Printer_Started_Log_Count", 5);
 
 			//Count of Special Print Log
 			localStorageService.set("Printer_Regular_PrintLog_Count", 5);
@@ -358,6 +360,18 @@ angular.module('starter.services', ['LocalStorageModule'])
 			if(pendingnum == 0)
 				pendingnum = "";
 			localStorageService.set("pendingnum", pendingnum);
+		}, 
+
+		addJobLog: function(log, joblist){
+			var jobid = log.job_id;
+			for(var i = 0; i < joblist.length; i++){
+				//For the user who create this log, the log will be added to his log directly.
+				//So joblist[i].log.length == log.job_status_id can prevent the same log from being added twice.
+				if(joblist[i].id == jobid && joblist[i].log.length == log.job_status_id){
+					joblist[i].log.push(log);
+					return;
+				}
+			}
 		}
 	}
 })
