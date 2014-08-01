@@ -231,6 +231,19 @@ angular.module('starter.services', ['LocalStorageModule'])
 				list.splice(index, 1);
 		},
 
+		replaceItemFromList: function(element, list){
+			var index = -1;
+			for(var i = 0; i < list.length; i++){
+				if(list[i].id == element.id){
+					index = i;
+					break;
+				}
+			}
+			alert(index);
+			if(index > -1)
+				list.splice(index, 1, element);
+		},
+
 		//getStaffByID from local array
 		getObjectById: function(id, list){
 			for(var i = 0; i < list.length; i++){

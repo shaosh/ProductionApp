@@ -107,9 +107,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if($scope.user.role_id == localStorageService.get('Manager')){
 			Helpers.incrementPendingnum();
 			$rootScope.pendingnum = localStorageService.get('pendingnum');
-			// data.pending = "Pending";
+			data.pending = "Pending";
 			$rootScope.jobs.push(data);
-			// localStorageService.set("joblist", $rootScope.jobs);
+			localStorageService.set("joblist", $rootScope.jobs);
 		}
 	});
 	//Need the server to include the job id in the data
@@ -142,15 +142,17 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 			else if(data.staff_id == $scope.user.id && data.add == false){
 				var job = Helpers.getObjectById(data.job.id, $rootScope.jobs);
+				alert(job.pending);
 				// alert(JSON.stringify(job));
 				// alert(job.pending);
 				if(job == null)
 					return;
 				if(job.pending == "Pending"){
 					Helpers.decrementPendingnum();
-					$rootScope.pendingnum = localStorageService.get('pendingnum');
+					$rootScope.pendingnum = localStorageService.get('pendingnum');					
 				}				
 				Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
+				localStorageService.set("joblist", $rootScope.jobs);
 				alert("You have been removed from the job " + data.job.id + ".");
 				if($rootScope.jobId == data.job.id)
 					$location.path('/' + $cookieStore.get('user').name + '/jobs');
@@ -213,6 +215,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}			
 		});
 		//Store the jobs list into the local storage, otherwise the jobs will be null after refresh the job view page.
+		//The rootScope.jobs(not scope.jobs) and its localstorage are mainly used for updating the pending num in the jobview page, not for other job details. 
 		localStorageService.set("joblist", $rootScope.jobs);
 	});
 	$scope.gatherPending = function(){		
@@ -443,6 +446,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					if(user.role_id == localStorageService.get("Prep") && $scope.currentStatus == 1){
 						Helpers.decrementPendingnum();
 						$rootScope.pendingnum = localStorageService.get("pendingnum");
+						//The code below is used to update pendingnum correctly.
+						//Otherwise after the job is started and no longer pending, if the job is removed,
+						//the pendingnum will be decremented again.
+						job.pending = "";
+						Helpers.replaceItemFromList(job, $rootScope.jobs);
+						localStorageService.set("joblist", $rootScope.jobs);
 					}
 				}
 				//The job is completed for this user
@@ -514,10 +523,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						//Decrement the badge number
 						Helpers.decrementPendingnum();
 						$rootScope.pendingnum = localStorageService.get("pendingnum");
-						// $rootScope.pendingnum--;
-						// if($rootScope.pendingnum == 0)
-						// 	$rootScope.pendingnum = "";
-
+						job.pending = "";
+						Helpers.replaceItemFromList(job, $rootScope.jobs);
+						localStorageService.set("joblist", $rootScope.jobs);
 						$scope.assigned = false;
 					}
 					else{
@@ -554,6 +562,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					if(!Helpers.checkQCStart(job)){
 						Helpers.decrementPendingnum();
 						$rootScope.pendingnum = localStorageService.get("pendingnum");
+						job.pending = "";
+						Helpers.replaceItemFromList(job, $rootScope.jobs);
+						localStorageService.set("joblist", $rootScope.jobs);
 					}
 					for(var i = 0; i < $scope.previews.length; i++){
 						if($scope.previews[i].location.location_id == $scope.currentLocationID){
@@ -615,6 +626,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					//Decrement badge for Printer
 					Helpers.decrementPendingnum();
 					$rootScope.pendingnum = localStorageService.get("pendingnum");
+					job.pending = "";
+					Helpers.replaceItemFromList(job, $rootScope.jobs);
+					localStorageService.set("joblist", $rootScope.jobs);
 				}
 			};
 		}
