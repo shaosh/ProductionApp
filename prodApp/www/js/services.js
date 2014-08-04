@@ -296,11 +296,21 @@ angular.module('starter.services', ['LocalStorageModule'])
 			return false;
 		},
 
+		//Check if the job has a Pending badge
+		hasPending: function(job, joblist){
+			for(var i = 0; i < joblist.length; i++){
+				if(joblist[i].id == job.id){
+					if(joblist[i].pending == undefined || joblist[i].pending == "" || joblist[i].pending == null)
+						return false;
+					else
+						return true;
+				}
+			}
+		},
+
 		//Check if printing of a job is started based on print log
 		checkQCStart: function(job){
 			var locations = job.location;
-			var nnLength = localStorageService.get("Printer_NN_PrintLog_Count");
-			var regularLength = localStorageService.get("Printer_Regular_PrintLog_Count");
 			for(var i = 0; i < locations.length; i++){
 				if(this.isLocationComplete(localStorageService.get("QC"), locations[i]))
 					return true;
@@ -377,19 +387,17 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 		//Add new job log to the $rootScope.joblogs which is displayed on screen
 		//job here is $rootScope.job
-		addJobLogView: function(log, job, joblogview){
+		addJobLogView: function(log, joblogview){
 			var logname = this.getObjectById(log.job_status_id, localStorageService.get("logstatuses")).name;
 			var logicon = "";
 			var length = joblogview.length;
 			joblogview[length - 1].icon = "ion-checkmark";
-			alert( localStorageService.get("QC_Completed_Log"));
 			if(log.job_status_id == localStorageService.get("QC_Completed_Log"))
 				logicon = "ion-checkmark-circled";
 			else if(log.job_status_id == localStorageService.get("Manager_Completed_Log") || log.job_status_id == localStorageService.get("Prep_Completed_Log") || log.job_status_id == localStorageService.get("Printer_Completed_Log"))
 				logicon = "ion-checkmark";
 			else
 				logicon = "ion-arrow-right-a";
-			alert(logicon);
 			joblogview.push({
 				"name": logname,
 				"icon": logicon
@@ -416,6 +424,29 @@ angular.module('starter.services', ['LocalStorageModule'])
 					}
 				}
 			}
+		},
+
+		//Add new print log to the $rootScope.printlogs which is displayed on screen
+		addPrintLogView: function(log, printlogview){
+			var logname = this.getObjectById(log.print_status_id, localStorageService.get("printstatuses")).name;
+			var logicon = "";
+			var length = printlogview.length;
+			if(log.location_id != localStorageService.get("NamesNumbers")){
+				if(log.print_status_id == localStorageService.get('QC_Completed_Regular_PrintLog'))
+					logicon =  "ion-checkmark-circled";
+				else
+					logicon =  "ion-checkmark";
+			}
+			else{
+				if(log.print_status_id == localStorageService.get('QC_Completed_NN_PrintLog'))
+					logicon =  "ion-checkmark-circled";
+				else
+					logicon =  "ion-checkmark";
+			}
+			printlogview.push({
+				"name": logname,
+				"icon": logicon
+			});
 		}
 	}
 })
