@@ -308,7 +308,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				}
 				Helpers.addPrintLogView(data, $rootScope.printlogs);
 				if(data.print_status_id == localStorageService.get('Printer_Completed_Regular_PrintLog') || data.print_status_id == localStorageService.get('Printer_Completed_NN_PrintLog')){
-					$rootScope.validNextPrintStatsus = true;
+					$rootScope.validNextPrintStatus = true;
 					$rootScope.nextPrintStatusText = Helpers.getObjectById(data.print_status_id + 1, localStorageService.get("printstatuses")).name;
 					$rootScope.currentPrintStatus = data.print_status_id;
 					$rootScope.nextStatusText = QC_NOT_COMPLETED;
@@ -519,9 +519,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			//Try to find: for a specific user, which status update is available
 			$rootScope.nextStatusText = ""; 
 			if(user.role_id == localStorageService.get("Prep"))
-				$scope.validNextStatsus = true;
+				$scope.validNextStatus = true;
 			else
-				$scope.validNextStatsus = false;
+				$scope.validNextStatus = false;
 			$scope.currentStatus = 0;
 
 			//If the job is already started, how to determine the current status of the job
@@ -561,7 +561,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				//The job is completed for this user
 				if($rootScope.nextStatusText == ""){
 					$rootScope.nextStatusText = logtextlist[logtextlist.length - 1].name;
-					$scope.validNextStatsus = false;
+					$scope.validNextStatus = false;
 				}
 			}
 
@@ -573,13 +573,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				}
 				else
 					$rootScope.nextStatusText = ASSIGNMENT_NOT_READY;
-				$scope.validNextStatsus = false;
+				$scope.validNextStatus = false;
 			}
 
 			//Actually this button is only valid for Prep
 			//Here $scope.currentStatus is used as array index which starts from 0
 			$scope.movetoNextStatus = function(){
-				if(!$scope.validNextStatsus)
+				if(!$scope.validNextStatus)
 					return;
 				var logicon = "";
 				//Seems the length==5 or 6 will not be invoked here
@@ -620,7 +620,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				//The job is completed for this user
 				else{
 					$rootScope.nextStatusText = logtextlist[logtextlist.length - 1].name;
-					$scope.validNextStatsus = false;
+					$scope.validNextStatus = false;
 				}
 			};
 		}
@@ -709,7 +709,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 
 			$scope.movetoNextPrintStatus = function(){
-				if(!$rootScope.validNextPrintStatsus)
+				if(!$rootScope.validNextPrintStatus)
 					return;
 				// $scope.processing = true;
 				var printlogList = localStorageService.get("printstatuses");
@@ -717,7 +717,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				$rootScope.currentPrintStatus++;
 				if($rootScope.currentPrintStatus == localStorageService.get("QC_Completed_Regular_PrintLog") || $rootScope.currentPrintStatus == localStorageService.get("QC_Completed_NN_PrintLog")){
 					logicon = "ion-checkmark-circled";
-					$rootScope.validNextPrintStatsus = false;
+					$rootScope.validNextPrintStatus = false;
 					//This if seems unnecessary
 					// if(user.role_id == localStorageService.get("QC")){
 					$rootScope.nextPrintStatusText = Helpers.getObjectById($rootScope.currentPrintStatus, localStorageService.get("printstatuses")).name;
@@ -748,7 +748,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				}
 				else if($rootScope.currentPrintStatus == localStorageService.get("Printer_Completed_Regular_PrintLog") || $rootScope.currentPrintStatus == localStorageService.get("Printer_Completed_NN_PrintLog")){
 					if(user.role_id == localStorageService.get("Printer")){
-						$rootScope.validNextPrintStatsus = false;
+						$rootScope.validNextPrintStatus = false;
 						$rootScope.nextPrintStatusText = Helpers.getObjectById($rootScope.currentPrintStatus, localStorageService.get("printstatuses")).name;
 						
 						for(var i = 0; i < $scope.previews.length; i++){
@@ -805,7 +805,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$scope.largePreviewText = location.name + " is not included in the design";
 			$scope.largePreviewName = location.name;
 			$rootScope.printlogs = [];
-			$rootScope.validNextPrintStatsus = true;
+			$rootScope.validNextPrintStatus = true;
 			$rootScope.currentPrintStatus = -1;
 			$rootScope.currentLocationID = location.location.location_id;
 			//Display the print logs
@@ -814,7 +814,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				//For any role the job is completed
 				if(printlog.print_status_id == localStorageService.get("QC_Completed_Regular_PrintLog") || printlog.print_status_id == localStorageService.get("QC_Completed_NN_PrintLog")){
 					logicon = "ion-checkmark-circled";
-					$rootScope.validNextPrintStatsus = false;
+					$rootScope.validNextPrintStatus = false;
 					if(user.role_id == localStorageService.get("QC"))
 						$rootScope.nextPrintStatusText = Helpers.getObjectById(printlog.print_status_id, localStorageService.get("printstatuses")).name;
 					else if(user.role_id == localStorageService.get("Printer"))
@@ -824,11 +824,11 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				else if(printlog.print_status_id == localStorageService.get("Printer_Completed_Regular_PrintLog") || printlog.print_status_id == localStorageService.get("Printer_Completed_NN_PrintLog")){
 					logicon = "ion-checkmark";
 					if(user.role_id == localStorageService.get("Printer")){
-						$rootScope.validNextPrintStatsus = false;
+						$rootScope.validNextPrintStatus = false;
 						$rootScope.nextPrintStatusText = Helpers.getObjectById(printlog.print_status_id, localStorageService.get("printstatuses")).name;
 					}
 					else if(user.role_id == localStorageService.get("QC")){
-						$rootScope.validNextPrintStatsus = true;
+						$rootScope.validNextPrintStatus = true;
 						$rootScope.currentPrintStatus = printlog.print_status_id;
 						$rootScope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById(printlog.print_status_id + 1, localStorageService.get("printstatuses")).name;						
 					}
@@ -841,7 +841,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						$rootScope.currentPrintStatus = printlog.print_status_id;
 					}
 					else if(user.role_id == localStorageService.get("QC")){
-						$rootScope.validNextPrintStatsus = false;
+						$rootScope.validNextPrintStatus = false;
 						$rootScope.nextPrintStatusText = PRINTING_NOT_READY;
 					}
 				}
@@ -854,7 +854,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			//Set the first print status when there is no printlog
 			if($rootScope.printlogs.length == 0){
 				if(user.role_id == localStorageService.get("QC")){
-					$rootScope.validNextPrintStatsus = false;
+					$rootScope.validNextPrintStatus = false;
 					$rootScope.nextPrintStatusText = PRINTING_NOT_READY;
 				}
 				else if(user.role_id == localStorageService.get("Printer")){
