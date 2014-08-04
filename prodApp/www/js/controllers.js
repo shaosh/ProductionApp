@@ -201,6 +201,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	socket.on('job:log:changed', function(data){		
 		if($scope.user.role_id == localStorageService.get("Manager")){
 			Helpers.addJobLog(data, $rootScope.jobs);
+			//If it is in the jobview page of this job, add it to the job log list.
+			if($rootScope.jobId == data.job_id)
+				Helpers.addJobLogView(data, $rootScope.job, $rootScope.joblogs);
 			var logname = Helpers.getObjectById(data.job_status_id, localStorageService.get("logstatuses")).name;
 			alert("The Job " + data.job_id + " is moved to Status " + logname + ".");
 		}
@@ -224,6 +227,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					for(var i = 0; i < jobs.length; i++){
 						if(jobs[i].id == data.job_id){
 							job = jobs[i];
+							break;
 						}
 					}
 					if(job != null){
@@ -238,6 +242,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 			else if(data.job_status_id == localStorageService.get('Printer_Completed_Log')){
 				Helpers.addJobLog(data, $rootScope.jobs);
+				if($rootScope.jobId == data.job_id)
+					Helpers.addJobLogView(data, $rootScope.job, $rootScope.joblogs);
 			}
 		}
 	});
@@ -255,6 +261,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			var printlogname = Helpers.getObjectById(data.print_status_id, localStorageService.get("printstatuses")).name;
 			alert("The Location " + locationname + " of Job " + data.job_id + " is moved to status " + printlogname + "." );
 			Helpers.addPrintLog(data, $rootScope.jobs);
+			//If it is in the jobview page and the related location is clicked
+			// if($rootScope.jobId == data.job_id &&)
 		}
 		else if($scope.user.role_id == localStorageService.get("QC")){
 			if(data.print_status_id == localStorageService.get("Press_Started_PrintLog")){
@@ -281,7 +289,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			Helpers.removeItemFromList(data, $rootScope.jobs);
 		}
 	});
-	socket.on('staff:authenticated', function(data){});	
+	//Data structure: User:{id:"", facility_id:"", name:"", role_id:""}
+	socket.on('staff:authenticated', function(data){
+		if($scope.user.role_id == localStorageService.get("Manager")){
+			alert(Helpers.getObjectById(data.role_id, localStorageService.get("roles")).name + " " + data.name + " is authenticated.");
+		}
+	});	
 
 	Api.getData("jobs").query(function(data){
 		$rootScope.jobs = [];

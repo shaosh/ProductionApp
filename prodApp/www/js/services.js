@@ -250,7 +250,6 @@ angular.module('starter.services', ['LocalStorageModule'])
 		replaceItemFromList: function(element, list){
 			var index = -1;
 			for(var i = 0; i < list.length; i++){
-				alert(i);
 				if(list[i].id == element.id){
 					index = i;
 					break;
@@ -363,6 +362,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 			localStorageService.set("pendingnum", pendingnum);
 		}, 
 
+		//Add new job log to the $rootScope.jobs
 		addJobLog: function(log, joblist){
 			var jobid = log.job_id;
 			for(var i = 0; i < joblist.length; i++){
@@ -375,6 +375,28 @@ angular.module('starter.services', ['LocalStorageModule'])
 			}
 		},
 
+		//Add new job log to the $rootScope.joblogs which is displayed on screen
+		//job here is $rootScope.job
+		addJobLogView: function(log, job, joblogview){
+			var logname = this.getObjectById(log.job_status_id, localStorageService.get("logstatuses")).name;
+			var logicon = "";
+			var length = joblogview.length;
+			joblogview[length - 1].icon = "ion-checkmark";
+			alert( localStorageService.get("QC_Completed_Log"));
+			if(log.job_status_id == localStorageService.get("QC_Completed_Log"))
+				logicon = "ion-checkmark-circled";
+			else if(log.job_status_id == localStorageService.get("Manager_Completed_Log") || log.job_status_id == localStorageService.get("Prep_Completed_Log") || log.job_status_id == localStorageService.get("Printer_Completed_Log"))
+				logicon = "ion-checkmark";
+			else
+				logicon = "ion-arrow-right-a";
+			alert(logicon);
+			joblogview.push({
+				"name": logname,
+				"icon": logicon
+			});
+		},
+
+		//Add new print log to the $rootScope.jobs
 		addPrintLog: function(log, joblist){
 			var jobid = log.job_id;
 			var locationid = log.location_id;
