@@ -202,7 +202,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if($scope.user.role_id == localStorageService.get("Manager")){
 			Helpers.addJobLog(data, $rootScope.jobs);			
 			//If it is in the jobview page of this job, add it to the job log list.
-			if($rootScope.jobId == data.job_id){
+			//Second condition: prevent add the same log repeatedly
+			if($rootScope.jobId == data.job_id && $rootScope.job.log.length == data.job_status_id){
 				Helpers.addJobLogView(data, $rootScope.joblogs);
 				$rootScope.job.log.push(data);
 			}
@@ -245,7 +246,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 			else if(data.job_status_id == localStorageService.get('Printer_Completed_Log')){
 				Helpers.addJobLog(data, $rootScope.jobs);				
-				if($rootScope.jobId == data.job_id){
+				if($rootScope.jobId == data.job_id && $rootScope.job.log.length == data.job_status_id){
 					Helpers.addJobLogView(data, $rootScope.joblogs);
 					$rootScope.job.log.push(data);
 				}
@@ -268,7 +269,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			Helpers.addPrintLog(data, $rootScope.jobs);
 			
 			//If it is in the jobview page and the related location is clicked
-			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id){
+			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id && 
+			   ((data.print_status_id == $rootScope.printlogs.length && data.location_id != localStorageService.get("NamesNumbers")) ||
+			   	(data.print_status_id == $rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) && data.location_id == localStorageService.get("NamesNumbers")))){
 				Helpers.addPrintLogView(data, $rootScope.printlogs);
 				//Update $rootScope.job
 				for(var i = 0; i < $rootScope.job.location; i++){
@@ -296,9 +299,15 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					}
 				}
 				break;
-			}			
-			
-			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id){
+			}	
+			// alert(data.print_status_id);
+			// alert($rootScope.printlogs.length);	
+			// alert( localStorageService.get('QC_Regular_PrintLog_Count'));
+			// alert($rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) );
+			// alert(	(data.print_status_id == $rootScope.printlogs.length + localStorageService.get('QC_Regular_PrintLog_Count') ));
+			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id && 
+			   ((data.print_status_id == $rootScope.printlogs.length && data.location_id != localStorageService.get("NamesNumbers")) ||
+			   	(data.print_status_id == $rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) && data.location_id == localStorageService.get("NamesNumbers")))){
 				//Update $rootScope.job
 				for(var i = 0; i < $rootScope.job.location; i++){
 					if($rootScope.job.location[i].location_id == data.location_id){

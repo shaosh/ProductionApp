@@ -624,8 +624,12 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 .factory('socket', function($rootScope){
 	/* Locate socket IO server via the ip and port*/
-    var socket = io.connect("http://127.0.0.1:3000"); 
+    var socket = io.connect("http://127.0.0.1:3000");
+    // alert(socket);
     return {
+    	reconnect: function(){
+    		socket.socket.connect();
+    	},
         on: function(eventName, callback) {
             socket.on(eventName, function() {
                 var args = arguments;
