@@ -625,11 +625,11 @@ angular.module('starter.services', ['LocalStorageModule'])
 .factory('socket', function($rootScope){
 	/* Locate socket IO server via the ip and port*/
     var socket = io.connect("http://127.0.0.1:3000");
-    // alert(socket);
+    // socket.on('disconnect', function(){alert("Disconnect")});
+    socket.on('connect', function(){alert("Connect")});
+    // socket.on('reconnect', function(){alert("Reconnect")});
+    // socket.on('reconnecting', function(){alert("Reconnecting")});
     return {
-    	reconnect: function(){
-    		socket.socket.connect();
-    	},
         on: function(eventName, callback) {
             socket.on(eventName, function() {
                 var args = arguments;
@@ -646,7 +646,7 @@ angular.module('starter.services', ['LocalStorageModule'])
                         callback.apply(socket, args);
                     }
                 });
-            })
+            });
         }
     };
 })

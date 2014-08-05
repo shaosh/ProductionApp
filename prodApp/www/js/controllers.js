@@ -269,6 +269,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			Helpers.addPrintLog(data, $rootScope.jobs);
 			
 			//If it is in the jobview page and the related location is clicked
+			//Prevent add the same status repeatedly or in inproper place
 			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id && 
 			   ((data.print_status_id == $rootScope.printlogs.length && data.location_id != localStorageService.get("NamesNumbers")) ||
 			   	(data.print_status_id == $rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) && data.location_id == localStorageService.get("NamesNumbers")))){
@@ -300,11 +301,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				}
 				break;
 			}	
-			// alert(data.print_status_id);
-			// alert($rootScope.printlogs.length);	
-			// alert( localStorageService.get('QC_Regular_PrintLog_Count'));
-			// alert($rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) );
-			// alert(	(data.print_status_id == $rootScope.printlogs.length + localStorageService.get('QC_Regular_PrintLog_Count') ));
+			//Prevent add the same status repeatedly or in inproper place
 			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id && 
 			   ((data.print_status_id == $rootScope.printlogs.length && data.location_id != localStorageService.get("NamesNumbers")) ||
 			   	(data.print_status_id == $rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) && data.location_id == localStorageService.get("NamesNumbers")))){
@@ -404,7 +401,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$rootScope.pendingnum = localStorageService.get('pendingnum');	
 	//Clear the overview.query
 	// $rootScope.overview = {};	
-
 	$scope.user = user;
 	$scope.rolename = $cookieStore.get("rolename");
 	$scope.isOverview = false;
