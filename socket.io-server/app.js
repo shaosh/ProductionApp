@@ -18,6 +18,7 @@ var dataChange = JSON.parse("{\"job\": " + job + ", \"staff_id\": 2, \"add\": fa
 
 
 io.sockets.on('connection', function(socket){
+	console.log('connection', socket);
 	socket.emit('job:received', dataJob);
 	// socket.emit('job:broadcast', dataMessage);
 	// socket.emit('job:staff:changed', dataChange);
