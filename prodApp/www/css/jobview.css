@@ -41,12 +41,33 @@
 }
 */
 
+#viewerdiv div{
+	margin-right: 10px;
+}
+
 #previewdiv{
 	margin-top: 20px;
 }
 
-#previewdiv div{
+#previewdiv div, #viewerdiv{
 	display:inline-block;
+}
+
+.card{
+	box-shadow: none;
+}
+
+.viewerlist{
+	display: block;	
+}
+
+.viewerlist .item{
+	background-color: rgba(156, 212, 41, 0.5);
+	border: 1px solid #51B419;
+}
+
+.non-viewerlist{
+	display: none;
 }
 
 .highlighted-large{

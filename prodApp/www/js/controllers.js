@@ -102,6 +102,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Socket.io listeners
 	//Assume the data is a json object of a new job to a specific facility
 	socket.on('job:received', function(data){
+		alert(data);
 		httpCache.add(url, data);
 		// alert("after: " + JSON.parse(cachedJobs[1]).length);		
 		if($scope.user.role_id == localStorageService.get('Manager')){
@@ -262,6 +263,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	});
 	//Data structure(printlog object): location:{id:"", job_id:"", location_id:"", print_status_id:""}
 	socket.on('job:location:changed', function(data){
+		alert(data);
 		if($scope.user.role_id == localStorageService.get("Manager")){
 			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
 			var printlogname = Helpers.getObjectById(data.print_status_id, localStorageService.get("printstatuses")).name;
@@ -327,6 +329,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
 			alert("The Location " + locationname + " of Job " + data.job_id + " is completed." );
 		}
+		else if($scope.user.role_id == localStorageService.get("QC")){
+			if(Helpers.isJobinJoblist(data.job_id, $rootScope.jobs))
+				Helpers.removeItemFromList(data.job_id, $rootScope.jobs);
+		}
 	});
 	//Assume the data is just the job id
 	socket.on('job:complete', function(data){
@@ -335,7 +341,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			if($scope.user.role_id == localStorageService.get("Manager")){
 				alert("The Job "  + data + " is completed.");
 			}
-			Helpers.removeItemFromList(data, $rootScope.jobs);
+			if(Helpers.isJobinJoblist(data.job_id, $rootScope.jobs))
+				Helpers.removeItemFromList(data, $rootScope.jobs);
 		}
 	});
 	//Data structure: User:{id:"", facility_id:"", name:"", role_id:""}
@@ -384,7 +391,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}			
 		});
 		//Store the jobs list into the local storage, otherwise the jobs will be null after refresh the job view page.
-		//The rootScope.jobs(not scope.jobs) and its localstorage are mainly used for updating the pending num in the jobview page, not for other job details. 
+		//The rootScope.jobs(not scope.jobs) and its localstorage are mainly used for updating te pending num in the jobview page, not for other job details. 
 		localStorageService.set("joblist", $rootScope.jobs);
 	});
 	$scope.gatherPending = function(){		
@@ -393,6 +400,42 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 })
 
 .controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
+	$rootScope.viewers = [];
+	//Notify the socket server the user opens this page
+	socket.emit('client:job:opened', {
+		"jobid": $stateParams.jobId,
+		"user": $cookieStore.get("user")
+	}, function(result){
+		alert(JSON.stringify(result));
+		if(!result)
+			alert('error!');
+		else{
+			Helpers.removeItemFromList($cookieStore.get("user").id, result);
+			$scope.viewers = result;
+			//Display warning for non-first QC viewing the job
+		}
+	});
+	//Notify the socket server the user leaves this page
+	$rootScope.$on('$stateChangeSuccess', function(ev, to, toParams, from, fromParams) {
+	    if(from.name == "jobview"){
+	    	socket.emit('client:job:closed', {
+				"jobid": $stateParams.jobId,
+				"user": $cookieStore.get("user")
+			});
+	    }
+	});
+
+	//Socket Listeners monitoring the changes of the viewerlist
+	socket.on('client:job:opened', function(data){
+		Helpers.removeItemFromList($cookieStore.get("user").id, data);
+		$scope.viewers = data;
+	});
+
+	socket.on('client:job:closed', function(data){
+		Helpers.removeItemFromList($cookieStore.get("user").id, data);
+		$scope.viewers = data;
+	});	
+
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
 	cssInjector.add('css/subheader.css');
@@ -626,6 +669,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				else{
 					$rootScope.nextStatusText = logtextlist[logtextlist.length - 1].name;
 					$scope.validNextStatus = false;
+					//If the job is burned by the Prep, it should be removed from the user's job overview. 
+					if(user.role_id == localStorageService.get("Prep")){
+						Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
+					}
 				}
 			};
 		}
@@ -748,6 +795,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 							"name": $rootScope.nextStatusText,
 							"icon": logicon
 						});
+						//Remove the job from the overview after it is finished by the QC
+						Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
 					}
 					// }
 				}
@@ -773,6 +822,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 							for(var i = 0; i < $rootScope.joblogs.length - 1; i++){
 								$rootScope.joblogs[i].icon = "ion-checkmark";
 							}
+							//Remove the job from the overview after it is finished by the printer
+							Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
 						}
 					}
 				}

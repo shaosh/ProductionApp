@@ -5,6 +5,14 @@
         <!-- <button class="button button-dark" ng-click="logoff()">Log Out</button> -->
     </div>    
     <ion-content class="has-subheader has-footer">
+        <div class="card" ng-class="{'viewerlist': viewers.length > 0, 'non-viewerlist': viewers.length == 0}">
+            <div class="item item-text-wrap">
+                The following users are also viewing this page:
+                <div id="viewerdiv" ng-repeat="viewer in viewers">
+                    <div>{{viewer.name}}</div>
+                </div>
+            </div>
+        </div>
         <div class="contentdiv">
             <p class="assertive">{{alert}}</p>
         </div>
