@@ -43,6 +43,7 @@
 
 #viewerdiv div{
 	margin-right: 10px;
+	font-weight: bold;
 }
 
 #previewdiv{
@@ -64,6 +65,7 @@
 .viewerlist .item{
 	background-color: rgba(156, 212, 41, 0.5);
 	border: 1px solid #51B419;
+	color:#51B419;
 }
 
 .non-viewerlist{

@@ -101,8 +101,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	var url = 'data/jobs.json';
 	//Socket.io listeners
 	//Assume the data is a json object of a new job to a specific facility
-	socket.on('job:received', function(data){
-		alert(data);
+	socket.on('job:received', function(data, callback){
+		// alert(data);
 		httpCache.add(url, data);
 		// alert("after: " + JSON.parse(cachedJobs[1]).length);		
 		if($scope.user.role_id == localStorageService.get('Manager')){
@@ -112,6 +112,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$rootScope.jobs.push(data);
 			localStorageService.set("joblist", $rootScope.jobs);
 		}
+		callback("OK");
 	});
 	//Need the server to include the job id in the data
 	//Prefered structure: data: { job_id: "", message: ""}
@@ -436,6 +437,24 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$scope.viewers = data;
 	});	
 
+
+	// var url = 'data/jobs.json';
+	// //Socket.io listeners
+	// //Assume the data is a json object of a new job to a specific facility
+	// socket.on('job:received', function(data, callback){
+	// 	// alert(data);
+	// 	httpCache.add(url, data);
+	// 	// alert("after: " + JSON.parse(cachedJobs[1]).length);		
+	// 	if($scope.user.role_id == localStorageService.get('Manager')){
+	// 		Helpers.incrementPendingnum();
+	// 		$rootScope.pendingnum = localStorageService.get('pendingnum');
+	// 		data.pending = "Pending";
+	// 		$rootScope.jobs.push(data);
+	// 		localStorageService.set("joblist", $rootScope.jobs);
+	// 	}
+	// 	callback("OK");
+	// });
+	
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
 	cssInjector.add('css/subheader.css');
