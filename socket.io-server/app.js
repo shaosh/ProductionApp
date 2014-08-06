@@ -26,8 +26,10 @@ var viewers = [];
 
 io.sockets.on('connection', function(socket){
 	console.log("Connection " + socket.id + " accepted.");
-	console.log('connection', socket);
-	socket.emit('job:received', dataJob);
+	// console.log('connection', socket);
+	socket.emit('job:received', dataJob, function(res){
+		console.log(res);
+	});
 	// console.log(222);
 	// socket.emit('job:broadcast', dataMessage);
 	// socket.emit('job:changed', dataJob);
@@ -41,25 +43,27 @@ io.sockets.on('connection', function(socket){
 	socket.on('disconnect', function(){
 		console.log("Connection " + socket.id + " terminated.");
 	});
-	socket.on('client:job:opened', function(data){
-		console.log("Entered:\n" + JSON.stringify(data));
-		viewers.push(data.user);
-		socket.broadcast.emit("client:job:opened", viewers);
-		// fn(viewers);
-	});
-	socket.on('client:job:closed', function(data){
-		console.log("Left:\n" + JSON.stringify(data));
-		var index = -1;
-		for(var i = 0; i < viewers.length; i++){
-			if(viewers[i].id == data.user.id){
-				index = i;
-				break;
-			}
-		}
-		if(index > -1)
-			viewers.splice(index, 1);
-		socket.broadcast.emit("client:job:closed", viewers);
-	});
+	// socket.on('client:job:opened', function(data){
+	// 	console.log("Entered:\n" + JSON.stringify(data));
+	// 	viewers.push(data.user);
+	// 	socket.emit("client:job:opened", viewers);
+	// 	console.log(viewers.length);
+	// 	// fn(viewers);
+	// });
+	// socket.on('client:job:closed', function(data){
+	// 	console.log("Left:\n" + JSON.stringify(data));
+	// 	var index = -1;
+	// 	for(var i = 0; i < viewers.length; i++){
+	// 		if(viewers[i].id == data.user.id){
+	// 			index = i;
+	// 			break;
+	// 		}
+	// 	}
+	// 	if(index > -1)
+	// 		viewers.splice(index, 1);
+	// 	socket.broadcast.emit("client:job:closed", viewers);
+	// 	console.log(viewers.length);
+	// });
 });
 
 
