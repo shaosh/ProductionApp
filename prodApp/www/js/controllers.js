@@ -7,7 +7,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		$cookieStore.get("password") != undefined &&
 		$cookieStore.get("authenticated") == "true"
 	){
-		// $location.path('/' + $cookieStore.get("user").name + '/jobs');
+		$location.path('/' + $cookieStore.get("user").name + '/jobs');
 	}
 
 	cssInjector.removeAll();
@@ -427,6 +427,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	});
 
 	//Socket Listeners monitoring the changes of the viewerlist
+	//Remove the user himself from the viewer list
 	socket.on('client:job:opened', function(data){
 		Helpers.removeItemFromList($cookieStore.get("user").id, data);
 		$scope.viewers = data;
@@ -442,6 +443,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// //Socket.io listeners
 	// //Assume the data is a json object of a new job to a specific facility
 	// socket.on('job:received', function(data, callback){
+	// 	alert(2);
 	// 	// alert(data);
 	// 	httpCache.add(url, data);
 	// 	// alert("after: " + JSON.parse(cachedJobs[1]).length);		
@@ -454,7 +456,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// 	}
 	// 	callback("OK");
 	// });
-	
+
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
 	cssInjector.add('css/subheader.css');
