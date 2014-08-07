@@ -142,7 +142,9 @@
 }
 
 .item.icon-left.ion-checkmark-circled, .assigned, .valid-next-status{
-	background-color: #9CD429;
+	background-color: rgba(156, 212, 41, 0.5);
+	border: 1px solid #51B419;
+	font-weight: bold;
 }
 
 #printlogdiv .item{

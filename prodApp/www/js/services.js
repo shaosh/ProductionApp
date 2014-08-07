@@ -255,8 +255,9 @@ angular.module('starter.services', ['LocalStorageModule'])
 					break;
 				}
 			}
+			//Make sure the replace is done by clone, not point to the reference
 			if(index > -1)
-				list.splice(index, 1, element);
+				list[index] = JSON.parse(JSON.stringify(element));
 		},
 
 		//getStaffByID from local array
@@ -451,7 +452,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 	}
 })
 
-.factory('Api', function($http, $resource){
+.factory('Api', function($http, $resource, localStorageService){
 	return{
 		//Get All Kinds of Data
 		getData: function(datatype){
@@ -505,13 +506,26 @@ angular.module('starter.services', ['LocalStorageModule'])
 				return result;
 			});
 		}, 
-		assignStaffs: function(staffs, jobId){
-			alert("jobid: " + jobId);
+		assignStaffs: function(staffs, job){
+			for(var i = 0; i < staffs.length; i++){
+				job.staff.push({
+					"id": job.staff.length,
+					"job_id": job.id,
+					"staff_id": staffs[i].id,
+					"role_id": staffs[i].role_id
+				});
+			}
+			job.log.push({
+				"id": job.log.length,
+				"job_id": job.id,
+				"job_status_id": localStorageService.get("Manager_Completed_Log")
+			});
+
 			var post = this.getData("jobs").query(function(){				
 				angular.forEach(staffs, function(staff){
 					for(var i = 0; i < post.length; i++){
 						// alert(i);
-						if(post[i].id == jobId){
+						if(post[i].id == job.id){
 							// alert(post[i].name);
 							// post[i].name = "changed";
 							// alert(JSON.stringify(post[i].$save()));	
@@ -649,15 +663,6 @@ angular.module('starter.services', ['LocalStorageModule'])
                 });
             });
         }
-        // , 
-        // m_disconnect: function(){
-        // 	socket.io.disconnect();
-        // 	alert("Disconnected");
-        // },
-        // m_reconnect: function(){
-        // 	socket.io.reconnect();
-        // 	alert("Reconnected");
-        // }
     };
 })
 

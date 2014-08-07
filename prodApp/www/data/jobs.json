@@ -9,30 +9,7 @@
 				"job_id": 554114,
 				"location_id": 0,
 				"printlog":[
-					{
-						"id": 0,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 0
-					},
-					{
-						"id": 1,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 1
-					},
-					{
-						"id": 2,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 2
-					},
-					{
-						"id": 3,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 3
-					}
+					
 				]
 			},
 			{
@@ -40,31 +17,7 @@
 				"job_id": 554114,
 				"location_id": 1,
 				"printlog":[
-					{
-						"id": 0,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 0
-					},
-					{
-						"id": 1,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 1
-					},
-					{
-						"id": 2,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 2
-					},
-					{
-						"id": 3,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 3
-					}
-
+					
 				]
 			},
 			{
@@ -72,12 +25,7 @@
 				"job_id": 554114,
 				"location_id": 10,
 				"printlog":[
-					{
-						"id": 0,
-						"job_id": 554114,
-						"location_id": 10,
-						"print_status_id": 6
-					}
+					
 				]
 			}
 		], 
@@ -87,18 +35,6 @@
 				"job_id": 554114,
 				"staff_id": 6,
 				"role_id": 3
-			},
-			{
-				"id": 1,
-				"job_id": 554114,
-				"staff_id": 0,
-				"role_id": 0
-			},
-			{
-				"id": 2,
-				"job_id": 554114,
-				"staff_id": 2,
-				"role_id": 1
 			}
 		],
 		"log": [
@@ -106,26 +42,6 @@
 				"id": 0,
 				"job_id": 554114,
 				"job_status_id": 0
-			},
-			{
-				"id": 1,
-				"job_id": 554114,
-				"job_status_id": 1
-			},
-			{
-				"id": 2,
-				"job_id": 554114,
-				"job_status_id": 2
-			},
-			{
-				"id": 3,
-				"job_id": 554114,
-				"job_status_id": 3
-			},
-			{
-				"id": 4,
-				"job_id": 554114,
-				"job_status_id": 4
 			}
 		]
 	},
@@ -202,12 +118,6 @@
 				"job_id": 554133,
 				"staff_id": 0,
 				"role_id": 0
-			},
-			{
-				"id": 2,
-				"job_id": 554133,
-				"staff_id": 2,
-				"role_id": 1
 			}
 		],
 		"log": [

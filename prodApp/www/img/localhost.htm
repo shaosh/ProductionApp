@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)http://localhost:8100/#/Tiago/jobs -->
+<html ng-app="starter"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\:form{display:block;}.ng-animate-block-transitions{transition:0s all!important;-webkit-transition:0s all!important;}.ng-hide-add-active,.ng-hide-remove{display:block!important;}</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link href="http://localhost:8100/lib/ionic/css/ionic.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="./localhost_files/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="./localhost_files/cordova.js"></script>
+
+    <!-- your app's js -->
+    <!-- <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script> --> <!--js for socket.io-->
+    <!--Copy the socket.io.js to local, otherwise the page loading might be held if the socket server is not running-->
+    <script src="./localhost_files/socket.io.js"></script>
+    <script src="./localhost_files/app.js"></script>
+    <script src="./localhost_files/jquery-1.11.0.min.js"></script><style type="text/css"></style>
+    <script src="./localhost_files/angular-css-injector.min.js"></script>
+    <script src="./localhost_files/angular-cookies.min.js"></script>
+    <script src="./localhost_files/angular-local-storage.min.js"></script>
+    <script src="./localhost_files/angular-resource.js"></script>
+    <script src="./localhost_files/services.js"></script>
+    <script src="./localhost_files/directives.js"></script>
+    <script src="./localhost_files/controllers.js"></script>
+  <!-- ngRepeat: stylesheet in injectedStylesheets --><link data-ng-repeat="stylesheet in injectedStylesheets" data-ng-href="css/overview.css" rel="stylesheet" href="http://localhost:8100/css/overview.css" class=""><!-- end ngRepeat: stylesheet in injectedStylesheets --><link data-ng-repeat="stylesheet in injectedStylesheets" data-ng-href="css/subheader.css" rel="stylesheet" href="http://localhost:8100/css/subheader.css" class=""><!-- end ngRepeat: stylesheet in injectedStylesheets --></head>
+  <body animation="slide-left-right-ios7" ng-controller="socketCtrl" class="grade-a platform-browser platform-win32 platform-ready">    
+    <!-- <ion-pane> -->
+      <!-- <ion-nav-bar type="bar-dark"> -->
+        <!-- <h1 class="title">DAS Production App</h1> -->
+      <!-- </ion-nav-bar> -->
+      <ion-nav-bar class="bar-dark bar bar-header nav-bar nav-title-slide-ios7 disable-user-behavior  no-animation" animation="nav-title-slide-ios7" back-button-type="button-icon button-clear" back-button-icon="ion-ios7-arrow-back">
+        <!-- <ion-nav-back-button class="button-icon icon  ion-ios7-arrow-back">          
+        </ion-nav-back-button> -->
+      <div class="buttons left-buttons"> </div><h1 ng-bind-html="title" class="title ng-binding">Overview (6 Jobs)</h1><div class="buttons right-buttons"> </div></ion-nav-bar>
+      <ion-nav-view><ion-view class="pane" title="Overview (6 Jobs)">
+    <!-- ngInclude: '/templates/subheader.html' --><div class="bar bar-subheader bar-stable" ng-include="&#39;/templates/subheader.html&#39;"><button class="button button-dark icon ion-navicon" ng-click="$overview()" style="height:32px"></button>
+<h2 class="title ng-binding">Manager: Tiago 
+    <button title="Pending Job Number" class="badge ng-binding pendingBadge" ng-class="{&#39;pendingBadge&#39;: pendingnum &gt; 0,
+                       &#39;no-pendingBadge&#39;: pendingnum &lt;= 0 || pendingnum == &#39;&#39;}" style="color: black" ng-click="gatherPending()">
+        2
+    </button>
+</h2>
+<button class="button button-dark" ng-click="$logoff.logoff()">Log Out</button></div>    
+    <ion-content class="has-subheader has-footer scroll-content ionic-scroll  has-header"><div class="scroll" style="-webkit-transform: translate3d(0px, 0px, 0px) scale(1);">
+        <div class="list list-inset">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="overview.query" class="ng-pristine ng-valid">
+            </label>
+            <br>
+            <div class="row" style="padding-left:0px; padding-right: 0px">
+                <div class="col-80">
+                    <select ng-model="orderProp" class="ng-pristine ng-valid">
+                        <option value="" selected="" disabled="">--Sort by--</option>
+                        <option value="name">Name</option>
+                        <option value="id">Job ID</option>
+                        <option value="date">Added Date</option>
+                        <option value="facility_id">Facility</option>
+                        <option value="pending">Status</option>
+                    </select>
+                </div>
+                <div class="col-20" style="padding-left:2%">
+                    <button id="reversebtn" ng-click="reverseOrder()">Reverse</button>
+                </div>
+            </div>
+        </div>
+        <ion-list class="disable-user-behavior"><div class="list">
+            <!-- ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse --><a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="http://localhost:8100/#/Tiago/jobs/554114">
+                <img class="front" src="./localhost_files/front.jpg" alt="front" title="front">
+                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
+                <h2 class="ng-binding">Job Name: names and numbers (554114)</h2>
+                <p class="ng-binding">Facility: 0</p>
+                <span class="badge ng-binding">Pending</span>
+            </a><!-- end ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse --><a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="http://localhost:8100/#/Tiago/jobs/554120">
+                <img class="front" src="./localhost_files/front(1).jpg" alt="front" title="front">
+                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
+                <h2 class="ng-binding">Job Name: cart-sizeup-test (554120)</h2>
+                <p class="ng-binding">Facility: 0</p>
+                <span class="badge ng-binding">Pending</span>
+            </a><!-- end ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse --><a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="http://localhost:8100/#/Tiago/jobs/554133">
+                <img class="front" src="./localhost_files/front(2).jpg" alt="front" title="front">
+                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
+                <h2 class="ng-binding">Job Name: gingerbreadman-test 2 (554133)</h2>
+                <p class="ng-binding">Facility: 0</p>
+                <span class="badge ng-binding"></span>
+            </a><!-- end ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse --><a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="http://localhost:8100/#/Tiago/jobs/554790">
+                <img class="front" src="./localhost_files/front(3).jpg" alt="front" title="front">
+                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
+                <h2 class="ng-binding">Job Name: franklin family (554790)</h2>
+                <p class="ng-binding">Facility: 1</p>
+                <span class="badge ng-binding"></span>
+            </a><!-- end ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse --><a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="http://localhost:8100/#/Tiago/jobs/554803">
+                <img class="front" src="./localhost_files/front(4).jpg" alt="front" title="front">
+                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
+                <h2 class="ng-binding">Job Name: testingdevtest (554803)</h2>
+                <p class="ng-binding">Facility: 1</p>
+                <span class="badge ng-binding"></span>
+            </a><!-- end ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse --><a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="http://localhost:8100/#/Tiago/jobs/554804">
+                <img class="front" src="./localhost_files/front(5).jpg" alt="front" title="front">
+                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
+                <h2 class="ng-binding">Job Name: flagtest (554804)</h2>
+                <p class="ng-binding">Facility: 1</p>
+                <span class="badge ng-binding"></span>
+            </a><!-- end ngRepeat: job in jobs | filter:overview.query | orderBy:orderProp:reverse -->
+        </div></ion-list>  
+    </div><div class="scroll-bar scroll-bar-v"><div class="scroll-bar-indicator scroll-bar-fade-out" style="height: 551px; -webkit-transform: translate3d(0px, 0px, 0px) scaleY(1);"></div></div></ion-content>
+    <div class="bar bar-footer bar-dark">
+        <div class="title">DAS Production V2</div>
+    </div>
+</ion-view></ion-nav-view>
+    <!-- </ion-pane> -->
+  
+<script type="text/javascript">//<![CDATA[
+document.write('<script src="' + (location.protocol || 'http:') + '//' + (location.hostname || 'localhost') + ':35729/livereload.js?snipver=1" type="text/javascript"><\/script>')
+//]]></script><script src="./localhost_files/livereload.js" type="text/javascript"></script>
+
+
+</body></html>
