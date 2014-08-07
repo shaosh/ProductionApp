@@ -301,7 +301,8 @@ angular.module('starter.services', ['LocalStorageModule'])
 		hasPending: function(job, joblist){
 			for(var i = 0; i < joblist.length; i++){
 				if(joblist[i].id == job.id){
-					if(joblist[i].pending == undefined || joblist[i].pending == "" || joblist[i].pending == null)
+					// if(joblist[i].pending == undefined || joblist[i].pending == "" || joblist[i].pending == null || joblist[i])
+					if(joblist[i].pending == undefined || joblist[i].pending != "Pending")
 						return false;
 					else
 						return true;

@@ -1,10 +1,10 @@
 
 angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageModule'])
-.controller('socketCtrl', function($rootScope, $location, $cookieStore, $state, localStorageService, Helpers, socket, httpCache){
+.controller('socketCtrl', function($rootScope, $location, $cookieStore, $state, Api, localStorageService, Helpers, socket, httpCache){
 	// if($cookieStore.get("authenticated") == "false"){
 	// 	return;
 	// }
-	var url = 'data/jobs.json';
+	var url = 'data/jobs.json';	
 	//Socket.io listeners
 	//Assume the data is a json object of a new job to a specific facility
 	socket.on('job:received', function(data, callback){
@@ -135,6 +135,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		else{
 			if(data.job_status_id == localStorageService.get('Printer_Started_Log')){
 				//The job item is fetched from the server, which is actually from the $http cache.
+				//Async query fetches data after all the socket is over, so can't use it.
 				Api.getData("jobs").query(function(jobs){
 					var job = null;
 					for(var i = 0; i < jobs.length; i++){
@@ -149,6 +150,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						// Helpers.incrementPendingnum();
 						// $rootScope.pendingnum = localStorageService.get('pendingnum');
 						// job.pending = "Pending";
+						job.pending = "Printing";
 						$rootScope.jobs.push(job);
 						localStorageService.set("joblist", $rootScope.jobs);
 					}
@@ -172,7 +174,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	});
 	//Data structure(printlog object): location:{id:"", job_id:"", location_id:"", print_status_id:""}
 	socket.on('job:location:changed', function(data){
-		alert(data);
 		if($rootScope.user.role_id == localStorageService.get("Manager")){
 			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
 			var printlogname = Helpers.getObjectById(data.print_status_id, localStorageService.get("printstatuses")).name;
@@ -229,6 +230,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$rootScope.nextPrintStatusText = Helpers.getObjectById(data.print_status_id + 1, localStorageService.get("printstatuses")).name;
 					$rootScope.currentPrintStatus = data.print_status_id;
 					$rootScope.nextStatusText = QC_NOT_COMPLETED;
+					$rootScope.currentStatus = localStorageService.get("Printer_Completed_Log");
 				}			
 			}
 		}
@@ -362,6 +364,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// alert("before: " + JSON.parse(cachedJobs[1]).length);
 
 	Api.getData("jobs").query(function(data){
+		// var url = 'data/jobs.json';
+		// alert(httpCache.getCount(url));
 		$rootScope.jobs = [];
 		angular.forEach(data, function(job){
 			if($rootScope.user.role_id == localStorageService.get("QC") || $rootScope.user.role_id == localStorageService.get("Manager")){
@@ -373,8 +377,11 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					if($rootScope.user.role_id == localStorageService.get("Manager"))
 						$rootScope.jobs.push(job);
 					//Add the job for the QC only when the job is ready for him. According to Cory, a job should be added to the QC's job list if it is started printing
-					else if($rootScope.user.role_id == localStorageService.get("QC") && job.log.length == localStorageService.get('Printer_Started_Log_Count')) //Helpers.isJobReadyForQC(job))
+					else if($rootScope.user.role_id == localStorageService.get("QC") && job.log.length == localStorageService.get('Printer_Started_Log_Count')){ //Helpers.isJobReadyForQC(job))
+						if(!Helpers.isJobReadyForQC(job))
+							job.pending = "Printing";
 						$rootScope.jobs.push(job);
+					}
 				}
 			}
 			else{
@@ -386,7 +393,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}	
 
 			//Calculate the pending job number in the badge in the subtitle
-			if(job.pending != "" && job.pending != undefined){
+			if(job.pending != "" && job.pending != undefined && job.pending != "Printing"){
 				// if($rootScope.pendingnum == "")
 				// 	$rootScope.pendingnum = 0;
 				// $rootScope.pendingnum++;
@@ -419,7 +426,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if(!result)
 			alert('error!');
 		else{
+			alert("remove start");
 			Helpers.removeItemFromList($cookieStore.get("user").id, result);
+			alert("remove end");
 			$scope.viewers = result;
 			//Display warning for non-first QC viewing the job
 		}
@@ -489,30 +498,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	// var url = 'data/jobs.json';
 	// $rootScope.jobs = httpCache.get(url);
 
-
-	//Assume the data is a json object of a new job to a specific facility
-	//job:received is defined in overview page. It is still working when the app is in the job view page. 
-	// socket.on('job:received', function(data){
-	// 	alert("Receive Job: " + JSON.stringify(data));
-	// 	httpCache.add(url, data);
-	// 	alert("after: " + JSON.parse(cachedJobs[1]).length);
-	// 	if(user.role_id == localStorageService.get('Manager')){
-	// 		Helpers.incrementPendingnum();
-	// 		$rootScope.pendingnum = localStorageService.get('pendingnum');
-	// 	}
-	// });
-
-
-	// socket.on('job:broadcast', function(data){});
-	// socket.on('job:changed', function(data){});
-	// socket.on('job:staff:changed', function(data){});
-	// socket.on('job:log:changed', function(data){});
-	// socket.on('job:location:started', function(data){});
-	// socket.on('job:location:changed', function(data){});
-	// socket.on('job:location:complete', function(data){});
-	// socket.on('job:complete', function(data){});
-	// socket.on('job:authenticated', function(data){});	
-
 	//Code which depends on the job variable
 	//Fetch the specific job based on its job id.
 	Api.getData("jobs").query(function(data){
@@ -580,7 +565,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				$scope.validNextStatus = true;
 			else
 				$scope.validNextStatus = false;
-			$scope.currentStatus = 0;
+			$rootScope.currentStatus = 0;
 
 			//If the job is already started, how to determine the current status of the job
 			if($rootScope.joblogs.length >= logtextlist[0].id){
@@ -590,7 +575,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					for(var j = 0; j < $rootScope.joblogs.length; j++){
 						if($rootScope.joblogs[j].name == logtextlist[i].name){
 							logExisted = true;
-							$scope.currentStatus = logtextlist[i].id;
+							$rootScope.currentStatus = logtextlist[i].id;
 						}
 					}
 					//Find out which status is the next status
@@ -604,12 +589,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						else if(i == 0 && user.role_id == localStorageService.get("Printer")){
 							$rootScope.nextStatusText = PRINTING_NOT_STARTED;
 							i = localStorageService.get("Prep_Completed_Log");
-							$scope.currentStatus = i;
+							$rootScope.currentStatus = i;
 						}
 						else if(i == 0 && user.role_id == localStorageService.get("QC")){
 							$rootScope.nextStatusText = QC_NOT_COMPLETED;
 							i = localStorageService.get("Printer_Completed_Log");
-							$scope.currentStatus = i;
+							$rootScope.currentStatus = i;
 						}
 						else
 							$rootScope.nextStatusText = logtextlist[i - 1].name;
@@ -627,7 +612,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			else{
 				if(user.role_id == localStorageService.get("QC") && Helpers.isJobReadyForQC($rootScope.job)){
 					$rootScope.nextStatusText = QC_NOT_COMPLETED;
-					$scope.currentStatus = localStorageService.get("Printer_Completed_Log");
+					$rootScope.currentStatus = localStorageService.get("Printer_Completed_Log");
 				}
 				else
 					$rootScope.nextStatusText = ASSIGNMENT_NOT_READY;
@@ -635,7 +620,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 
 			//Actually this button is only valid for Prep
-			//Here $scope.currentStatus is used as array index which starts from 0
+			//Here $rootScope.currentStatus is used as array index which starts from 0
 			$scope.movetoNextStatus = function(){
 				if(!$scope.validNextStatus)
 					return;
@@ -651,7 +636,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					logicon = "ion-arrow-right-a";
 
 				$rootScope.joblogs.push({
-					"name": logtextlist[$scope.currentStatus].name,
+					"name": logtextlist[$rootScope.currentStatus].name,
 					"icon": logicon
 				});
 
@@ -659,12 +644,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$rootScope.joblogs[i].icon = "ion-checkmark";
 				}
 
-				$scope.currentStatus++;
-				if($scope.currentStatus < logtextlist.length){
-					$rootScope.nextStatusText = "Move to Next Status:" + logtextlist[$scope.currentStatus].name;
+				$rootScope.currentStatus++;
+				if($rootScope.currentStatus < logtextlist.length){
+					$rootScope.nextStatusText = "Move to Next Status:" + logtextlist[$rootScope.currentStatus].name;
 
-					//$scope.currentStatus here is actually array index. If it is 1, it means the job is just started.
-					if(user.role_id == localStorageService.get("Prep") && $scope.currentStatus == 1){
+					//$rootScope.currentStatus here is actually array index. If it is 1, it means the job is just started.
+					if(user.role_id == localStorageService.get("Prep") && $rootScope.currentStatus == 1){
 						Helpers.decrementPendingnum();
 						$rootScope.pendingnum = localStorageService.get("pendingnum");
 						//The code below is used to update pendingnum correctly.
@@ -681,7 +666,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$scope.validNextStatus = false;
 					//If the job is burned by the Prep, it should be removed from the user's job overview. 
 					if(user.role_id == localStorageService.get("Prep")){
-						Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
+						Helpers.removeItemFromList($rootScope.job.id, $rootScope.jobs);
 					}
 				}
 			};
@@ -793,7 +778,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					// if(user.role_id == localStorageService.get("QC")){
 					$rootScope.nextPrintStatusText = Helpers.getObjectById($rootScope.currentPrintStatus, localStorageService.get("printstatuses")).name;
 					//Decrement the badge if the job is not started for the QC
-					if(!Helpers.checkQCStart($rootScope.job)){
+					if(!Helpers.checkQCStart($rootScope.job) || Helpers.hasPending($rootScope.job, $rootScope.jobs)){
 						Helpers.decrementPendingnum();
 						$rootScope.pendingnum = localStorageService.get("pendingnum");
 						$rootScope.job.pending = "";
@@ -805,17 +790,16 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 							$scope.previews[i].completed = true;
 						}
 					}
-
 					//If all locations are QCed, the job is completed for the QC.
 					if(Helpers.checkPrintingComplete($rootScope.job, user.role_id, $rootScope.currentLocationID)){
-						$scope.currentStatus++;
-						$rootScope.nextStatusText = Helpers.getObjectById($scope.currentStatus, localStorageService.get("logstatuses")).name;
+						$rootScope.currentStatus++;
+						$rootScope.nextStatusText = Helpers.getObjectById($rootScope.currentStatus, localStorageService.get("logstatuses")).name;
 						$rootScope.joblogs.push({
 							"name": $rootScope.nextStatusText,
 							"icon": logicon
 						});
 						//Remove the job from the overview after it is finished by the QC
-						Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
+						Helpers.removeItemFromList($rootScope.job.id, $rootScope.jobs);
 					}
 					// }
 				}
@@ -832,8 +816,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 						//If all locations are printed, the job is completed for the printer.
 						if(Helpers.checkPrintingComplete($rootScope.job, user.role_id, $rootScope.currentLocationID)){
-							$scope.currentStatus++;
-							$rootScope.nextStatusText = Helpers.getObjectById($scope.currentStatus, localStorageService.get("logstatuses")).name;
+							$rootScope.currentStatus++;
+							$rootScope.nextStatusText = Helpers.getObjectById($rootScope.currentStatus, localStorageService.get("logstatuses")).name;
 							$rootScope.joblogs.push({
 								"name": $rootScope.nextStatusText,
 								"icon": logicon
@@ -842,7 +826,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 								$rootScope.joblogs[i].icon = "ion-checkmark";
 							}
 							//Remove the job from the overview after it is finished by the printer
-							Helpers.removeItemFromList(data.job.id, $rootScope.jobs);
+							Helpers.removeItemFromList($rootScope.job.id, $rootScope.jobs);
 						}
 					}
 				}
@@ -855,8 +839,8 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				});
 
 				if($rootScope.nextStatusText == PRINTING_NOT_STARTED){
-					$scope.currentStatus++;
-					$rootScope.nextStatusText = Helpers.getObjectById($scope.currentStatus, localStorageService.get("logstatuses")).name;
+					$rootScope.currentStatus++;
+					$rootScope.nextStatusText = Helpers.getObjectById($rootScope.currentStatus, localStorageService.get("logstatuses")).name;
 					$rootScope.joblogs.push({
 						"name": $rootScope.nextStatusText,
 						"icon": "ion-arrow-right-a"
