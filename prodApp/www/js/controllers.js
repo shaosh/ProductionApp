@@ -474,6 +474,13 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	    }
 	});
 
+	setInterval(function(){
+		socket.emit('client:job:ping',{
+			"jobid": $stateParams.jobId,
+			"user": $cookieStore.get("user")
+		});
+	}, 15000);
+
 	//Socket Listeners monitoring the changes of the viewerlist
 	//Remove the user himself from the viewer list
 	socket.on('client:job:opened', function(data){
