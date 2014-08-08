@@ -1,5 +1,5 @@
 .pane{
-	background: url(img/login-bg.png);
+	background: url(/img/login-bg.png);
 	background-repeat:no-repeat;
 	background-size: cover;
 	overflow: hidden;
