@@ -133,7 +133,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		else{
 			if(data.job_status_id == localStorageService.get('Printer_Started_Log')){
 				//The job item is fetched from the server, which is actually from the $http cache.
-				//Async query fetches data after all the socket is over, so can't use it.
 				Api.getData("jobs").query(function(jobs){
 					var job = null;
 					for(var i = 0; i < jobs.length; i++){
@@ -154,7 +153,14 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					}
 				});
 			}
-			else if(data.job_status_id == localStorageService.get('Printer_Completed_Log')){
+			// else if(data.job_status_id == localStorageService.get('Printer_Completed_Log')){
+			// 	Helpers.addJobLog(data, $rootScope.jobs);				
+			// 	if($rootScope.jobId == data.job_id && $rootScope.job.log.length == data.job_status_id){
+			// 		Helpers.addJobLogView(data, $rootScope.joblogs);
+			// 		$rootScope.job.log.push(data);
+			// 	}
+			// }
+			else{
 				Helpers.addJobLog(data, $rootScope.jobs);				
 				if($rootScope.jobId == data.job_id && $rootScope.job.log.length == data.job_status_id){
 					Helpers.addJobLogView(data, $rootScope.joblogs);
@@ -203,9 +209,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			//If this is the first printing completed job, increment the pending badge for the QC as notification.
 			if(data.print_status_id == localStorageService.get('Printer_Completed_Regular_PrintLog') || data.print_status_id == localStorageService.get('Printer_Completed_NN_PrintLog')){
 				for(var i = 0; i < $rootScope.jobs.length; i++){
-					alert($rootScope.jobs.length);
 					if($rootScope.jobs[i].id == data.job_id){
-						alert($rootScope.jobs[i].pending);
 						if($rootScope.jobs[i].pending == undefined || $rootScope.jobs[i].pending != "Pending"){
 							Helpers.incrementPendingnum();
 							$rootScope.pendingnum = localStorageService.get('pendingnum');

@@ -19,7 +19,7 @@ img {
 }
 
 .item .badge{
-	background-color: #9CD429;
+	background-color: rgba(156, 212, 41, 0.5);
 	color: #000;
 	border: 1px solid #51B419;
 }
