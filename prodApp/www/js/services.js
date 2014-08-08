@@ -449,6 +449,15 @@ angular.module('starter.services', ['LocalStorageModule'])
 				"name": logname,
 				"icon": logicon
 			});
+		},
+
+		makePreviewReady: function(previews, locationid){
+			for(var i = 0; i < previews.length; i++){
+				if(previews[i].location.location_id == locationid){
+					previews[i].ready = true;
+					return;
+				}
+			}
 		}
 	}
 })

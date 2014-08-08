@@ -20,31 +20,7 @@
 						"job_id": 554114,
 						"location_id": 0,
 						"print_status_id": 1
-					},
-					{
-						"id": 2,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 2
-					},
-					{
-						"id": 3,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 3
-					},
-					{
-						"id": 4,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 4
-					},
-					{
-						"id": 5,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 5
-					}							
+					}						
 				]
 			},
 			{
@@ -75,19 +51,7 @@
 						"job_id": 554114,
 						"location_id": 0,
 						"print_status_id": 3
-					},
-					{
-						"id": 4,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 4
-					},
-					{
-						"id": 5,
-						"job_id": 554114,
-						"location_id": 0,
-						"print_status_id": 5
-					}		
+					}	
 				]
 			},
 			{

@@ -25,7 +25,7 @@
                             'unhighlighted': $index!=selectedImg} " >
                 <img                     
                     ng-src="{{preview.src}}" 
-                    ng-class="{'uncompleted-location': preview.completed==false}"
+                    ng-class="{'unready-location': preview.ready==false}"
                     alt="{{preview.name}}" 
                     title="{{preview.name}}" style="height: 40px; width: 40px">
             </div>

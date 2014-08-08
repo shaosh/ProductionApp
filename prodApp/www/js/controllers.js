@@ -8,7 +8,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Socket.io listeners
 	//Assume the data is a json object of a new job to a specific facility
 	socket.on('job:received', function(data, callback){
-		alert(data);
 		httpCache.add(url, data);
 		// alert("after: " + JSON.parse(cachedJobs[1]).length);		
 		if($rootScope.user.role_id == localStorageService.get('Manager')){
@@ -203,27 +202,34 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 			Helpers.addPrintLog(data, $rootScope.jobs);
 			//If this is the first printing completed job, increment the pending badge for the QC as notification.
-			for(var i = 0; i < $rootScope.jobs.length; i++){
-				if($rootScope.jobs[i].id == data.job_id){
-					if($rootScope.jobs[i].pending == undefined || $rootScope.jobs[i].pending != "Pending"){
-						Helpers.incrementPendingnum();
-						$rootScope.pendingnum = localStorageService.get('pendingnum');
-						$rootScope.jobs[i].pending = "Pending";
-					}
-				}
-				break;
-			}	
+			if(data.print_status_id == localStorageService.get('Printer_Completed_Regular_PrintLog') || data.print_status_id == localStorageService.get('Printer_Completed_NN_PrintLog')){
+				for(var i = 0; i < $rootScope.jobs.length; i++){
+					alert($rootScope.jobs.length);
+					if($rootScope.jobs[i].id == data.job_id){
+						alert($rootScope.jobs[i].pending);
+						if($rootScope.jobs[i].pending == undefined || $rootScope.jobs[i].pending != "Pending"){
+							Helpers.incrementPendingnum();
+							$rootScope.pendingnum = localStorageService.get('pendingnum');
+							$rootScope.jobs[i].pending = "Pending";
+							localStorageService.set("joblist", $rootScope.jobs);
+						}
+						break;
+					}				
+				}	
+			}
 			//Prevent add the same status repeatedly or in inproper place
+			//If the printlog of current location is updated
 			if($rootScope.jobId == data.job_id && $rootScope.currentLocationID == data.location_id && 
 			   ((data.print_status_id == $rootScope.printlogs.length && data.location_id != localStorageService.get("NamesNumbers")) ||
 			   	(data.print_status_id == $rootScope.printlogs.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) && data.location_id == localStorageService.get("NamesNumbers")))){
 				//Update $rootScope.job
-				for(var i = 0; i < $rootScope.job.location; i++){
+				for(var i = 0; i < $rootScope.job.location.length; i++){
 					if($rootScope.job.location[i].location_id == data.location_id){
 						$rootScope.job.location[i].printlog.push(data);
 						break;
 					}
 				}
+				//Update the screen
 				Helpers.addPrintLogView(data, $rootScope.printlogs);
 				if(data.print_status_id == localStorageService.get('Printer_Completed_Regular_PrintLog') || data.print_status_id == localStorageService.get('Printer_Completed_NN_PrintLog')){
 					$rootScope.validNextPrintStatus = true;
@@ -231,11 +237,30 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$rootScope.currentPrintStatus = data.print_status_id;
 					$rootScope.nextStatusText = QC_NOT_COMPLETED;
 					$rootScope.currentStatus = localStorageService.get("Printer_Completed_Log");
+					Helpers.makePreviewReady($rootScope.previews, data.location_id);
 				}			
+			}
+			//If the printlog of other location is updated
+			else if($rootScope.jobId == data.job_id && $rootScope.currentLocationID != data.location_id){	
+				for(var i = 0; i < $rootScope.job.location.length; i++){
+					if($rootScope.job.location[i].location_id == data.location_id){
+						if((data.print_status_id == $rootScope.job.location[i].printlog.length && data.location_id != localStorageService.get("NamesNumbers")) ||
+			   			   (data.print_status_id == $rootScope.job.location[i].printlog.length + parseInt(localStorageService.get('QC_Regular_PrintLog_Count')) && data.location_id == localStorageService.get("NamesNumbers"))){
+							//Update $rootScope.job
+							$rootScope.job.location[i].printlog.push(data);
+							//Update screen
+							if(data.print_status_id == localStorageService.get('Printer_Completed_Regular_PrintLog') || data.print_status_id == localStorageService.get('Printer_Completed_NN_PrintLog')){
+								Helpers.makePreviewReady($rootScope.previews, data.location_id);
+							}
+							break;
+						}
+					}
+				}
 			}
 		}
 	});
 	socket.on('job:location:complete', function(data){
+		alert("location:complete: " + JSON.stringify(data));
 		if($rootScope.user.role_id == localStorageService.get("Manager")){
 			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
 			alert("The Location " + locationname + " of Job " + data.job_id + " is completed." );
@@ -508,7 +533,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			}
 		}
 		$rootScope.job = job;
-		$scope.previews = [];
+		$rootScope.previews = [];
 		//Generate the small preview image for all locations
 		angular.forEach($rootScope.job.location, function(location){
 			var previewname = Helpers.getObjectById(location.location_id, localStorageService.get("locations")).name.toLowerCase();
@@ -516,15 +541,17 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				var src = "img/namesnums.png";
 			else
 				var src = "img/jobs/" + $rootScope.job.id + "/" + previewname + ".jpg";
-			if(user.role_id == localStorageService.get("Manager") || user.role_id == localStorageService.get("Prep"))
-				var isCompleted = true;
+			if(user.role_id == localStorageService.get("Manager") || user.role_id == localStorageService.get("Prep") || user.role_id == localStorageService.get("Printer"))
+				var isReady = true;
+			//If a location is completed by a printer, it is ready for the QC
 			else
-				var isCompleted = Helpers.isLocationComplete(user.role_id, location);
-			$scope.previews.push({
+				var isReady = Helpers.isLocationComplete(localStorageService.get("Printer"), location);
+				// var isCompleted = Helpers.isLocationComplete(user.role_id, location);
+			$rootScope.previews.push({
 				"location": location, 
 				"src": src,
 				"name": previewname,
-				"completed": isCompleted
+				"ready": isReady
 			});
 		});
 		$scope.facility_name = Helpers.getObjectById($rootScope.job.facility_id, localStorageService.get("facilities")).name;
@@ -769,8 +796,19 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					return;
 				// $scope.processing = true;
 				var printlogList = localStorageService.get("printstatuses");
-				var logicon = "ion-checkmark";
+				var logicon = "ion-checkmark";				
 				$rootScope.currentPrintStatus++;
+				//Update the printlog of the location in the $rootScope.job
+				for(var i = 0; i < $rootScope.job.location.length; i++){
+					if($rootScope.job.location[i].location_id == $rootScope.currentLocationID){
+						$rootScope.job.location[i].printlog.push({
+							"id": $rootScope.job.location[i].printlog.length,
+							"job_id": $rootScope.jobId,
+							"location_id": $rootScope.currentLocationID,
+							"print_status_id": $rootScope.currentPrintStatus
+						});
+					}
+				}
 				if($rootScope.currentPrintStatus == localStorageService.get("QC_Completed_Regular_PrintLog") || $rootScope.currentPrintStatus == localStorageService.get("QC_Completed_NN_PrintLog")){
 					logicon = "ion-checkmark-circled";
 					$rootScope.validNextPrintStatus = false;
@@ -785,9 +823,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						Helpers.replaceItemFromList($rootScope.job, $rootScope.jobs);
 						localStorageService.set("joblist", $rootScope.jobs);
 					}
-					for(var i = 0; i < $scope.previews.length; i++){
-						if($scope.previews[i].location.location_id == $rootScope.currentLocationID){
-							$scope.previews[i].completed = true;
+					for(var i = 0; i < $rootScope.previews.length; i++){
+						if($rootScope.previews[i].location.location_id == $rootScope.currentLocationID){
+							// $scope.previews[i].completed = true;
 						}
 					}
 					//If all locations are QCed, the job is completed for the QC.
@@ -808,9 +846,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						$rootScope.validNextPrintStatus = false;
 						$rootScope.nextPrintStatusText = Helpers.getObjectById($rootScope.currentPrintStatus, localStorageService.get("printstatuses")).name;
 						
-						for(var i = 0; i < $scope.previews.length; i++){
-							if($scope.previews[i].location.location_id == $rootScope.currentLocationID){
-								$scope.previews[i].completed = true;
+						for(var i = 0; i < $rootScope.previews.length; i++){
+							if($rootScope.previews[i].location.location_id == $rootScope.currentLocationID){
+								// $scope.previews[i].completed = true;
 							}
 						}
 
