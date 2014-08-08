@@ -471,15 +471,18 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				"jobid": $stateParams.jobId,
 				"user": $cookieStore.get("user")
 			});
+			delete($stateParams.jobId);
 	    }
 	});
 
 	setInterval(function(){
-		socket.emit('client:job:ping',{
-			"jobid": $stateParams.jobId,
-			"user": $cookieStore.get("user")
-		});
-	}, 15000);
+		if($stateParams.jobId != undefined){
+			socket.emit('client:job:ping',{
+				"jobid": $stateParams.jobId,
+				"user": $cookieStore.get("user")
+			});
+		}
+	}, 5000);
 
 	//Socket Listeners monitoring the changes of the viewerlist
 	//Remove the user himself from the viewer list
