@@ -234,6 +234,19 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 		},
 
+		//Similar to removeItemFromList, but need to use different ID
+		removePreview: function(id, list){
+			var index = -1;
+			for(var i = 0; i < list.length; i++){
+				if(list[i].location_id == id){
+					index = i;
+					break;
+				}
+			}
+			if(index > -1)
+				list.splice(index, 1);
+		},
+
 		//Function to remove an item from the list based on id
 		removeItemFromList: function(id, list){
 			var index = -1;
@@ -453,7 +466,7 @@ angular.module('starter.services', ['LocalStorageModule'])
 
 		makePreviewReady: function(previews, locationid){
 			for(var i = 0; i < previews.length; i++){
-				if(previews[i].location.location_id == locationid){
+				if(previews[i].location_id == locationid){
 					previews[i].ready = true;
 					return;
 				}

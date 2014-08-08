@@ -74,7 +74,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Prefered data structure:
 	//data: {job: "", staff_id: "", add:"true/false"}
 	socket.on('job:staff:changed', function(data){
-
 		if(!Helpers.isJobinJoblist(data.job.id, $rootScope.jobs))
 			return;
 		if($rootScope.user.role_id == localStorageService.get('Prep') || 
@@ -260,14 +259,17 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		}
 	});
 	socket.on('job:location:complete', function(data){
-		alert("location:complete: " + JSON.stringify(data));
 		if($rootScope.user.role_id == localStorageService.get("Manager")){
 			var locationname = Helpers.getObjectById(data.location_id, localStorageService.get("locations")).name;
 			alert("The Location " + locationname + " of Job " + data.job_id + " is completed." );
 		}
 		else if($rootScope.user.role_id == localStorageService.get("QC")){
-			if(Helpers.isJobinJoblist(data.job_id, $rootScope.jobs))
-				Helpers.removeItemFromList(data.job_id, $rootScope.jobs);
+			if($rootScope.jobId == data.job_id){
+				Helpers.removePreview(data.location_id, $rootScope.previews);
+				if($rootScope.previews.length == 0){
+					$rootScope.nextStatusText = Helpers.getObjectById(localStorageService.get("QC_Completed_Log"), localStorageService.get("logstatuses")).name;
+				}
+			}
 		}
 	});
 	//Assume the data is just the job id
@@ -547,12 +549,23 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			else
 				var isReady = Helpers.isLocationComplete(localStorageService.get("Printer"), location);
 				// var isCompleted = Helpers.isLocationComplete(user.role_id, location);
-			$rootScope.previews.push({
-				"location": location, 
-				"src": src,
-				"name": previewname,
-				"ready": isReady
-			});
+			location.src = src;
+			location.name = previewname;
+			location.ready = isReady;
+			if(user.role_id == localStorageService.get('Printer') || user.role_id == localStorageService.get('QC')){
+				if(!Helpers.isLocationComplete(user.role_id, location))
+					$rootScope.previews.push(location);
+			}
+			else{
+				$rootScope.previews.push(location);
+			}
+			
+			// $rootScope.previews.push({
+			// 	"location": location, 
+			// 	"src": src,
+			// 	"name": previewname,
+			// 	"ready": isReady
+			// });
 		});
 		$scope.facility_name = Helpers.getObjectById($rootScope.job.facility_id, localStorageService.get("facilities")).name;
 
@@ -823,11 +836,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 						Helpers.replaceItemFromList($rootScope.job, $rootScope.jobs);
 						localStorageService.set("joblist", $rootScope.jobs);
 					}
-					for(var i = 0; i < $rootScope.previews.length; i++){
-						if($rootScope.previews[i].location.location_id == $rootScope.currentLocationID){
+					Helpers.removePreview($rootScope.currentLocationID, $rootScope.previews);
+					// for(var i = 0; i < $rootScope.previews.length; i++){
+					// 	if($rootScope.previews[i].location_id == $rootScope.currentLocationID){
 							// $scope.previews[i].completed = true;
-						}
-					}
+					// 	}
+					// }
 					//If all locations are QCed, the job is completed for the QC.
 					if(Helpers.checkPrintingComplete($rootScope.job, user.role_id, $rootScope.currentLocationID)){
 						$rootScope.currentStatus++;
@@ -837,7 +851,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 							"icon": logicon
 						});
 						//Remove the job from the overview after it is finished by the QC
-						Helpers.removeItemFromList($rootScope.job.id, $rootScope.jobs);
+						Helpers.removeItemFromList($rootScope.job.id, $rootScope.jobs);						
 					}
 					// }
 				}
@@ -845,12 +859,12 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					if(user.role_id == localStorageService.get("Printer")){
 						$rootScope.validNextPrintStatus = false;
 						$rootScope.nextPrintStatusText = Helpers.getObjectById($rootScope.currentPrintStatus, localStorageService.get("printstatuses")).name;
-						
-						for(var i = 0; i < $rootScope.previews.length; i++){
-							if($rootScope.previews[i].location.location_id == $rootScope.currentLocationID){
+						Helpers.removePreview($rootScope.currentLocationID, $rootScope.previews);
+						// for(var i = 0; i < $rootScope.previews.length; i++){
+						// 	if($rootScope.previews[i].location_id == $rootScope.currentLocationID){
 								// $scope.previews[i].completed = true;
-							}
-						}
+						// 	}
+						// }
 
 						//If all locations are printed, the job is completed for the printer.
 						if(Helpers.checkPrintingComplete($rootScope.job, user.role_id, $rootScope.currentLocationID)){
@@ -904,9 +918,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			$rootScope.printlogs = [];
 			$rootScope.validNextPrintStatus = true;
 			$rootScope.currentPrintStatus = -1;
-			$rootScope.currentLocationID = location.location.location_id;
+			$rootScope.currentLocationID = location.location_id;
 			//Display the print logs
-			angular.forEach(location.location.printlog, function(printlog){
+			angular.forEach(location.printlog, function(printlog){
 				var logicon = "";
 				//For any role the job is completed
 				if(printlog.print_status_id == localStorageService.get("QC_Completed_Regular_PrintLog") || printlog.print_status_id == localStorageService.get("QC_Completed_NN_PrintLog")){
@@ -955,7 +969,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$rootScope.nextPrintStatusText = PRINTING_NOT_READY;
 				}
 				else if(user.role_id == localStorageService.get("Printer")){
-					if(location.location.location_id == localStorageService.get("NamesNumbers"))
+					if(location.location_id == localStorageService.get("NamesNumbers"))
 						$rootScope.currentPrintStatus = localStorageService.get("Printer_Regular_PrintLog_Count");
 						// $scope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById(6, localStorageService.get("printstatuses")).name;
 					// }
