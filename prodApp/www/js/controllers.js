@@ -397,6 +397,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	Api.getData("jobs").query(function(data){
 		// var url = 'data/jobs.json';
 		// alert(httpCache.getCount(url));
+		alert(data.length);
 		$rootScope.jobs = [];
 		angular.forEach(data, function(job){
 			if($rootScope.user.role_id == localStorageService.get("QC") || $rootScope.user.role_id == localStorageService.get("Manager")){
