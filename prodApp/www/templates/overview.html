@@ -1,5 +1,5 @@
 <ion-view title="Overview ({{jobs.length}} Jobs)">
-    <div class="bar bar-subheader bar-stable" ng-include="'../templates/subheader.html'">
+    <div class="bar bar-subheader bar-stable" ng-include="'templates/subheader.html'">
     </div>    
     <ion-content class="has-subheader has-footer">
         <div class="list list-inset">
@@ -25,7 +25,7 @@
             </div>
         </div>
         <ion-list>
-            <a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="/#/{{user.name}}/jobs/{{job.id}}">
+            <a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="#/{{user.name}}/jobs/{{job.id}}">
                 <img class="front" src="/img/jobs/{{job.id}}/front.jpg" alt="front" title="front" />
                 <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
                 <h2>Job Name: {{job.name}} ({{job.id}})</h2>

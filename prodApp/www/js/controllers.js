@@ -383,7 +383,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Have to store the badge number in local storage, otherwise it is incorrect after refresh in the job view page.
 	localStorageService.set('pendingnum', "");
 	$rootScope.pendingnum = "";
-	$rootScope.badgelink = "/#/" + $rootScope.user.name + "/pendingjobs";
+	$rootScope.badgelink = "#/" + $rootScope.user.name + "/pendingjobs";
 
 	$scope.reverseOrder = function(){
 		$scope.reverse = !$scope.reverse;
