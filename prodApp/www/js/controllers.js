@@ -444,6 +444,9 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.gatherPending = function(){		
 		$rootScope.overview.query = "Pending";
 	};
+	$scope.doRefresh = function(){
+
+	}
 })
 
 .controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
@@ -991,11 +994,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$rootScope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById($rootScope.currentPrintStatus + 1, localStorageService.get("printstatuses")).name;
 				}
 			}
-		};
-
-		$scope.gatherPending = function(){
-			Account.overview(false);
-			$rootScope.overview.query = "Pending";
 		};
 	});
 });
