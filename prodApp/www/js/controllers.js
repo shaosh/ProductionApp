@@ -397,7 +397,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	Api.getData("jobs").query(function(data){
 		// var url = 'data/jobs.json';
 		// alert(httpCache.getCount(url));
-		alert(data.length);
 		$rootScope.jobs = [];
 		angular.forEach(data, function(job){
 			if($rootScope.user.role_id == localStorageService.get("QC") || $rootScope.user.role_id == localStorageService.get("Manager")){
@@ -445,9 +444,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	$scope.gatherPending = function(){		
 		$rootScope.overview.query = "Pending";
 	};
-	$scope.doRefresh = function(){
-
-	}
 })
 
 .controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
@@ -995,6 +991,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 					$rootScope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById($rootScope.currentPrintStatus + 1, localStorageService.get("printstatuses")).name;
 				}
 			}
+		};
+		$scope.gatherPending = function(){
+			Account.overview(false);
+			$rootScope.overview.query = "Pending";
 		};
 	});
 });
