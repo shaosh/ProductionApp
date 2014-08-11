@@ -1,9 +1,6 @@
 
-angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageModule'])
-.controller('socketCtrl', function($rootScope, $location, $cookieStore, $state, Api, localStorageService, Helpers, socket, httpCache){
-	// if($cookieStore.get("authenticated") == "false"){
-	// 	return;
-	// }
+angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
+.controller('socketCtrl', function($rootScope, $location, $state, Api, localStorageService, Helpers, socket, httpCache){
 	var url = 'data/jobs.json';	
 	//Socket.io listeners
 	//Assume the data is a json object of a new job to a specific facility
@@ -33,7 +30,6 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		alert(JSON.stringify(data));
 		if(!Helpers.isJobinJoblist(data.id, $rootScope.jobs))
 			return;
-		// $location.path('/' + $cookieStore.get('user').name + '/jobs/' + data.id);
 		httpCache.update(url, data);
 		alert("The Job " + data.id + " has been changed.");
 		//If the user is no longer a staff for this job, remove it and update the pending number
@@ -49,7 +45,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			Helpers.removeItemFromList(data.id, $rootScope.jobs);
 			localStorageService.set("joblist", $rootScope.jobs);
 			if($rootScope.jobId == data.id){
-				$location.path('/' + $cookieStore.get('user').name + '/jobs');
+				$location.path('/' + localStorageService.get('user').name + '/jobs');
 			}
 		}
 		//If the user is still a staff of the job, update the pending number and job list. May reload the jobview page. 
@@ -100,7 +96,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 				localStorageService.set("joblist", $rootScope.jobs);
 				alert("You have been removed from the Job " + data.job.id + ".");
 				if($rootScope.jobId == data.job.id)
-					$location.path('/' + $cookieStore.get('user').name + '/jobs');
+					$location.path('/' + localStorageService.get('user').name + '/jobs');
 			}
 		}
 	});
@@ -296,26 +292,26 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 
 })
 
-.controller('LoginCtrl', function($scope, $location, $cookieStore, localStorageService, cssInjector, Account, Api, Helpers){
+.controller('LoginCtrl', function($scope, $location, localStorageService, cssInjector, Account, Api, Helpers){
 	if(
-		$cookieStore.get("user") != undefined &&
-		$cookieStore.get("password") != undefined &&
-		$cookieStore.get("authenticated") == "true"
+		localStorageService.get("user") != undefined &&
+		localStorageService.get("password") != undefined &&
+		localStorageService.get("authenticated") == "true"
 	){
-		$location.path('/' + $cookieStore.get("user").name + '/jobs');
+		$location.path('/' + localStorageService.get("user").name + '/jobs');
 	}
 
 	cssInjector.removeAll();
 	cssInjector.add('css/login.css');    
 	$scope.logindata = {};
 	
-	if($cookieStore.get("user") != undefined){
-		$scope.logindata.username = $cookieStore.get("user").name;
-		$scope.logindata.roleid = $cookieStore.get("user").role_id;
+	if(localStorageService.get("user") != undefined){
+		$scope.logindata.username = localStorageService.get("user").name;
+		$scope.logindata.roleid = localStorageService.get("user").role_id;
 	}
 
-	if($cookieStore.get("password") != undefined)
-		$scope.logindata.password = $cookieStore.get("password");
+	if(localStorageService.get("password") != undefined)
+		$scope.logindata.password = localStorageService.get("password");
 
 	$scope.roles = Api.getData("roles").query();
 
@@ -334,7 +330,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 			if(user != null && roleid == user.role_id){
 				Account.login(user, password, rolename);
 
-				localStorageService.clearAll();
+				// localStorageService.clearAll();
 				localStorageService.set("roles", $scope.roles);
 				Account.cacheConstants();
 			}
@@ -345,10 +341,10 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 
 	$scope.clearCookies = function(){
-		$cookieStore.remove("user");
-		$cookieStore.remove("password");
-		$cookieStore.remove("authenticated");
-		$cookieStore.remove("rolename");
+		localStorageService.remove("user");
+		localStorageService.remove("password");
+		localStorageService.remove("authenticated");
+		localStorageService.remove("rolename");
 
 		$scope.logindata.username = "";
 		$scope.logindata.password = "";
@@ -356,15 +352,20 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $http, $location, $state, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cacheFactory, $http, $location, $state, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
 	cssInjector.add('css/subheader.css');
 // $httpDefaultCache = $cacheFactory.get('$http');
 // if($httpDefaultCache.get('data/jobs.json') != undefined)
 // alert("after: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
-	$rootScope.user = $cookieStore.get("user");
-	$scope.rolename = $cookieStore.get("rolename");
+	$rootScope.user = localStorageService.get("user");
+	// $rootScope.user = {
+	// 	name: "Tiago",
+	// 	role_id: 3,
+	// 	facility_id: [0, 1]
+	// }
+	$scope.rolename = localStorageService.get("rolename");
 	$scope.orderProp = '';
 	$scope.isOverview = false;
 	$scope.$logoff = Account;
@@ -383,7 +384,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Have to store the badge number in local storage, otherwise it is incorrect after refresh in the job view page.
 	localStorageService.set('pendingnum', "");
 	$rootScope.pendingnum = "";
-	$rootScope.badgelink = "#/" + $rootScope.user.name + "/pendingjobs";
+	$rootScope.badgelink = "/#/" + $rootScope.user.name + "/pendingjobs";
 
 	$scope.reverseOrder = function(){
 		$scope.reverse = !$scope.reverse;
@@ -446,19 +447,19 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	};
 })
 
-.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cookieStore, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
+.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
 	$rootScope.viewers = [];
 	//Notify the socket server the user opens this page
 	socket.emit('client:job:opened', {
 		"jobid": $stateParams.jobId,
-		"user": $cookieStore.get("user")
+		"user": localStorageService.get("user")
 	}, function(result){
 		alert(JSON.stringify(result));
 		if(!result)
 			alert('error!');
 		else{
 			alert("remove start");
-			Helpers.removeItemFromList($cookieStore.get("user").id, result);
+			Helpers.removeItemFromList(localStorageService.get("user").id, result);
 			alert("remove end");
 			$scope.viewers = result;
 			//Display warning for non-first QC viewing the job
@@ -469,7 +470,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	    if(from.name == "jobview"){
 	    	socket.emit('client:job:closed', {
 				"jobid": $stateParams.jobId,
-				"user": $cookieStore.get("user")
+				"user": localStorageService.get("user")
 			});
 			delete($stateParams.jobId);
 	    }
@@ -479,7 +480,7 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 		if($stateParams.jobId != undefined){
 			socket.emit('client:job:ping',{
 				"jobid": $stateParams.jobId,
-				"user": $cookieStore.get("user")
+				"user": localStorageService.get("user")
 			});
 		}
 	}, 5000);
@@ -487,31 +488,31 @@ angular.module('starter.controllers', ['ngCookies', 'ngResource', 'LocalStorageM
 	//Socket Listeners monitoring the changes of the viewerlist
 	//Remove the user himself from the viewer list
 	socket.on('client:job:opened', function(data){
-		Helpers.removeItemFromList($cookieStore.get("user").id, data);
+		Helpers.removeItemFromList(localStorageService.get("user").id, data);
 		$scope.viewers = data;
 	});
 
 	socket.on('client:job:closed', function(data){
-		Helpers.removeItemFromList($cookieStore.get("user").id, data);
+		Helpers.removeItemFromList(localStorageService.get("user").id, data);
 		$scope.viewers = data;
 	});	
 
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
 	cssInjector.add('css/subheader.css');
-	var user = $cookieStore.get("user");	
+	var user = localStorageService.get("user");	
 	var roles = localStorageService.get("roles");
 	$rootScope.pendingnum = localStorageService.get('pendingnum');	
 	//Clear the overview.query
 	// $rootScope.overview = {};	
 	$rootScope.user = user;
-	$scope.rolename = $cookieStore.get("rolename");
+	$scope.rolename = localStorageService.get("rolename");
 	$scope.isOverview = false;
 	//Function to log off
 	$scope.$logoff = Account;	
 	//Function to go to overview page
 	$scope.$overview = function(){
-		$location.path('/' + $cookieStore.get('user').name + '/jobs');
+		$location.path('/' + localStorageService.get('user').name + '/jobs');
 	};
 	if($rootScope.jobs == undefined || $rootScope.jobs == null){
 		$rootScope.jobs = localStorageService.get("joblist");

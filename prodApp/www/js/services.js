@@ -68,14 +68,15 @@ angular.module('starter.services', ['LocalStorageModule'])
 	}
 })
 
-.factory('Account', function($location, $cookieStore, localStorageService, Api){
+.factory('Account', function($location, localStorageService, Api){
 	return{
 		login: function(user, password, rolename){
-			$cookieStore.put("user", user);
-			$cookieStore.put("password", password);
-			$cookieStore.put("rolename", rolename);
-			$cookieStore.put("authenticated", "true");
-			// $cookieStore.put("roles", $scope.roles);
+			localStorageService.clearAll();
+			localStorageService.set("user", user);
+			localStorageService.set("password", password);
+			localStorageService.set("rolename", rolename);
+			localStorageService.set("authenticated", "true");
+			// localStorageService.set("roles", $scope.roles);
 			$location.path('/' + user.name + '/jobs');
 		},
 
@@ -138,13 +139,13 @@ angular.module('starter.services', ['LocalStorageModule'])
 		},
 
 		logoff: function(){
-			$cookieStore.put("authenticated", "false");
-			$location.path('/login');
+			localStorageService.set("authenticated", "false");
+			$location.path('login');
 		},
 
 		overview: function(isOverview){
 			if(!isOverview)
-				$location.path('/' + $cookieStore.get('user').name + '/jobs');
+				$location.path('' + localStorageService.get('user').name + '/jobs');
 		}
 	}	
 })
