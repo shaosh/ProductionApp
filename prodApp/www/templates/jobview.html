@@ -1,5 +1,5 @@
-<ion-view title="Job Details: {{job.name}} ({{job.id}})">
-    <div class="bar bar-subheader bar-stable" ng-include="'/templates/subheader.html'">
+<ion-view title="{{job.name}} ({{job.id}})">
+    <div class="bar bar-subheader bar-stable" ng-include="'templates/subheader.html'">
         <!-- <h2 class="title">{{user.role}}: {{user.name}}</h2> -->
         <!-- <h2 class="title">{{job.name}} ({{job.id}})</h2> -->
         <!-- <button class="button button-dark" ng-click="logoff()">Log Out</button> -->
@@ -32,21 +32,7 @@
         </div>
         <div id="large-preview" class="contentdiv"
              ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
-            <div class="row" style="margin-left: 0px">
-                <div id="largeimagediv" style="margin: 0px" class="col-20"
-                     >
-                    <img ng-src=" {{selectedImgSrc}} "  
-                         alt="{{largePreviewText}}" 
-                         title="{{largePreviewText}}" style="margin-left: 0px">
-                </div>
-                <div id="printlogdiv" class="list list-inset contentdiv col-80" style="margin: 0px">
-                    <div class="item item-divider">
-                        Print Log - {{largePreviewName}}
-                    </div>
-                    <div ng-repeat="printlog in printlogs | orderBy:orderProp" class="item icon-left {{printlog.icon}}">
-                        {{printlog.name}}
-                    </div>
-                </div>
+            <div id="locationdiv" ng-include="LocationDiv">
             </div>
             <!-- <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div> -->   
             <div id="printerdiv1" class="cusdiv" ng-include="PrinterDiv1"></div>  

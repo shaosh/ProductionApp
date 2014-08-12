@@ -12,7 +12,7 @@
 .highlighted{
 	height: 46px;
 	width: 46px;
-	border: 3px solid #9CD429;
+	border: 3px solid rgba(156, 212, 41, 0.5);
 	margin: 3px;
 }
 
@@ -99,7 +99,7 @@
 }
 
 .row div{
-	padding-right: 30px;
+	padding-right: 1%;
 }
 
 .row div:last-child{

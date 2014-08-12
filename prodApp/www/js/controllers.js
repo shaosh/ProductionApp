@@ -298,7 +298,7 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 		localStorageService.get("password") != undefined &&
 		localStorageService.get("authenticated") == "true"
 	){
-		$location.path('/' + localStorageService.get("user").name + '/jobs');
+		$location.path("/#/" + localStorageService.get("user").name + '/jobs');
 	}
 
 	cssInjector.removeAll();
@@ -447,7 +447,7 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 	};
 })
 
-.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket){
+.controller('JobviewCtrl', function($rootScope, $scope, $stateParams, $cacheFactory, $location, localStorageService, cssInjector, Helpers, Account, Api, httpCache, socket, matchmedia){
 	$rootScope.viewers = [];
 	//Notify the socket server the user opens this page
 	socket.emit('client:job:opened', {
@@ -497,6 +497,18 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 		$scope.viewers = data;
 	});	
 
+	//Adjust the layout based on the device width
+	// if(matchmedia.isLandscape() || matchmedia.isDesktop()){
+	// 	$scope.LocationDiv = "templates/WidePriview.html";
+	// }
+	// else{
+	// 	$scope.LocationDiv = "templates/NarrowPriview.html";
+	// }
+
+	// alert(matchmedia.isLandscape());
+	// alert(matchmedia.isDesktop());
+	// alert(matchmedia.isPortrait());
+
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
 	cssInjector.add('css/subheader.css');
@@ -513,6 +525,7 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 	//Function to go to overview page
 	$scope.$overview = function(){
 		$location.path('/' + localStorageService.get('user').name + '/jobs');
+		$rootScope.overview.query = "";
 	};
 	if($rootScope.jobs == undefined || $rootScope.jobs == null){
 		$rootScope.jobs = localStorageService.get("joblist");
@@ -605,7 +618,7 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 
 		//Add the next status button for non-manager users
 		if(user.role_id != localStorageService.get("Manager")){
-			$scope.UpdateStatusDiv = "/templates/" + NON_MANAGER_DIV + ".html";
+			$scope.UpdateStatusDiv = "templates/" + NON_MANAGER_DIV + ".html";
 			//Find all the job logs based on the user's role
 			var logtextlist = [];
 			angular.forEach(localStorageService.get("logstatuses"), function(log){
@@ -744,7 +757,7 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 						}
 					});
 				});
-				$scope.UpdateStatusDiv = "/templates/" + ASSIGNED_MANAGER_DIV + ".html";	
+				$scope.UpdateStatusDiv = "templates/" + ASSIGNED_MANAGER_DIV + ".html";	
 				$scope.assign = function(){
 					$scope.alert = "This job has already been assigned";
 				};
@@ -806,17 +819,17 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 						$scope.alert = "This job has already been assigned";
 					}
 				};
-				$scope.UpdateStatusDiv = "/templates/" + UNASSIGNED_MANAGER_DIV + ".html";
+				$scope.UpdateStatusDiv = "templates/" + UNASSIGNED_MANAGER_DIV + ".html";
 			}			
 		}
 
 		//Add the areas specific for printer/QC users
 		if(user.role_id == localStorageService.get("Printer") || user.role_id == localStorageService.get("QC")){
 			//For printers, always add the change print status button
-			$scope.PrinterDiv1 = "/templates/" + PRINTER_DIV1 + ".html";
+			$scope.PrinterDiv1 = "templates/" + PRINTER_DIV1 + ".html";
 			//Check if the printer has "Names & Numbers" job
 			if(Helpers.hasNamesNumbers($rootScope.job, localStorageService.get("NamesNumbers"))){
-				$scope.PrinterDiv2 = "/templates/" + PRINTER_DIV2 + ".html";
+				$scope.PrinterDiv2 = "templates/" + PRINTER_DIV2 + ".html";
 			}
 
 			$scope.movetoNextPrintStatus = function(){
@@ -991,6 +1004,14 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 					// else
 					$rootScope.nextPrintStatusText = "Move to Next Print Status: " + Helpers.getObjectById($rootScope.currentPrintStatus + 1, localStorageService.get("printstatuses")).name;
 				}
+			}
+
+			//Adjust the layout based on the device width
+			if(matchmedia.isLandscape() || matchmedia.isDesktop()){
+				$scope.LocationDiv = "templates/WidePriview.html";
+			}
+			else{
+				$scope.LocationDiv = "templates/NarrowPriview.html";
 			}
 		};
 		$scope.gatherPending = function(){

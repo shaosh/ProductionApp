@@ -1,0 +1,13 @@
+<div id="largeimagediv" style="margin: 0px">
+    <img ng-src=" {{selectedImgSrc}} "  
+         alt="{{largePreviewText}}" 
+         title="{{largePreviewText}}" style="margin-left: 0px">
+</div>
+<div id="printlogdiv" class="list list-inset contentdiv" style="margin: 0px">
+    <div class="item item-divider">
+        Print Log - {{largePreviewName}}
+    </div>
+    <div ng-repeat="printlog in printlogs | orderBy:orderProp" class="item icon-left {{printlog.icon}}">
+        {{printlog.name}}
+    </div>
+</div>

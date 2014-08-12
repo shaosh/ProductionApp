@@ -30,3 +30,7 @@ img {
 	border: 1px solid #51B419;
 	font-weight: bold;
 }
+
+.item p, .item h2{
+	margin-bottom: 0px;
+}
