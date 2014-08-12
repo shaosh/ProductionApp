@@ -497,17 +497,18 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 		$scope.viewers = data;
 	});	
 
+	$scope.location = {}
 	//Adjust the layout based on the device width
-	// if(matchmedia.isLandscape() || matchmedia.isDesktop()){
-	// 	$scope.LocationDiv = "templates/WidePriview.html";
-	// }
-	// else{
-	// 	$scope.LocationDiv = "templates/NarrowPriview.html";
-	// }
-
-	// alert(matchmedia.isLandscape());
-	// alert(matchmedia.isDesktop());
-	// alert(matchmedia.isPortrait());
+	matchmedia.onLandscape(function(mediaQueryList){
+		if(mediaQueryList.matches){
+			$scope.location.url = "templates/WidePriview.html";
+		}
+	});
+	matchmedia.onPortrait(function(mediaQueryList){
+		if(mediaQueryList.matches){
+			$scope.location.url = "templates/NarrowPriview.html";
+		}
+	});
 
 	cssInjector.removeAll();
 	cssInjector.add('css/jobview.css');
@@ -1008,10 +1009,10 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 
 			//Adjust the layout based on the device width
 			if(matchmedia.isLandscape() || matchmedia.isDesktop()){
-				$scope.LocationDiv = "templates/WidePriview.html";
+				$scope.location.url = "templates/WidePriview.html";
 			}
 			else{
-				$scope.LocationDiv = "templates/NarrowPriview.html";
+				$scope.location.url = "templates/NarrowPriview.html";
 			}
 		};
 		$scope.gatherPending = function(){

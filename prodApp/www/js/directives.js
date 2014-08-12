@@ -19,3 +19,6 @@
 // 		replace: true
 // 	};
 // });
+
+// var starter = angular.module('starter.directives', []);
+// starter.directive('locationdiv')
