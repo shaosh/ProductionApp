@@ -1,4 +1,12 @@
 <ion-view title="Overview ({{jobs.length}} Jobs)">
+    <ion-nav-buttons side="right">
+        <button class="button button-icon icon ion-ios7-barcode-outline" 
+                style="height:32px; padding:0px" 
+                title="Scan Barcode"
+                ng-click="takeBarcode()"
+                ng-class="{'visible': isManager == true,
+                           'hide': isManager == false}"></button>
+    </ion-nav-buttons>
     <div class="bar bar-subheader bar-stable" ng-include="'templates/subheader.html'">
     </div>    
     <ion-content class="has-subheader has-footer">

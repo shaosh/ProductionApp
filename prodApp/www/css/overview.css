@@ -34,3 +34,7 @@ img {
 .item p, .item h2{
 	margin-bottom: 0px;
 }
+
+.visible{
+	display: block;
+}

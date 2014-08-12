@@ -352,7 +352,7 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 	};
 })
 
-.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cacheFactory, $http, $location, $state, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
+.controller('OverviewCtrl', function($rootScope, $scope, $stateParams, $cacheFactory, $http, $location, $state, $cordovaBarcodeScanner, cssInjector, localStorageService, Helpers, Account, Api, httpCache, socket){
 	cssInjector.removeAll();
 	cssInjector.add('css/overview.css');
 	cssInjector.add('css/subheader.css');
@@ -360,11 +360,40 @@ angular.module('starter.controllers', ['ngResource', 'LocalStorageModule'])
 // if($httpDefaultCache.get('data/jobs.json') != undefined)
 // alert("after: " + JSON.parse($httpDefaultCache.get('data/jobs.json')[1]).length);
 	$rootScope.user = localStorageService.get("user");
-	// $rootScope.user = {
-	// 	name: "Tiago",
-	// 	role_id: 3,
-	// 	facility_id: [0, 1]
-	// }
+	if($rootScope.user.role_id == localStorageService.get("Manager"))
+		$scope.isManager = true;
+	else
+		$scope.isManager = false;
+
+	//Function to take picture of the barcode
+	$scope.takeBarcode = function(){
+		$cordovaBarcodeScanner.scan().then(function(result) {
+			alert(JSON.stringify(result));
+		    // Scanner result  }, function(err) {
+		},
+		function(err){
+			alert("ERROR: " + err);
+		});
+		/*Code to take picture with Phonegap.camera
+		var options =   {
+			quality : 100, 
+	        destinationType : Camera.DestinationType.FILE_URI, 
+	        sourceType : Camera.PictureSourceType.CAMERA, 
+	        allowEdit : false,
+	        encodingType: Camera.EncodingType.JPEG,
+	        popoverOptions: CameraPopoverOptions,
+	        saveToPhotoAlbum: true
+        };
+        $cordovaCamera.getPicture(options).then(function(FILE_URI) {
+        	alert(FILE_URI);
+	      // Success! Image data is here
+	    }, function(err) {
+	    	alert("Fail to Take the Barcode because: " + err);
+	      // An error occured. Show a message to the user
+	    });
+		*/
+	};
+
 	$scope.rolename = localStorageService.get("rolename");
 	$scope.orderProp = '';
 	$scope.isOverview = false;
