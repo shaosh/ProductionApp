@@ -1,8 +1,5 @@
 <ion-view title="{{job.name}} ({{job.id}})">
     <div class="bar bar-subheader bar-stable" ng-include="'templates/subheader.html'">
-        <!-- <h2 class="title">{{user.role}}: {{user.name}}</h2> -->
-        <!-- <h2 class="title">{{job.name}} ({{job.id}})</h2> -->
-        <!-- <button class="button button-dark" ng-click="logoff()">Log Out</button> -->
     </div>    
     <ion-content class="has-subheader has-footer">
         <div class="card" ng-class="{'viewerlist': viewers.length > 0, 'non-viewerlist': viewers.length == 0}">
@@ -16,7 +13,6 @@
         <div class="contentdiv">
             <p class="assertive">{{alert}}</p>
         </div>
-        <!-- <div id="managerdiv" class="cusdiv contentdiv" ng-include="ManagerDiv"></div> --> 
         <div id="updatestatusdiv" class="cusdiv contentdiv" ng-include="UpdateStatusDiv"></div>
         <div id="previewdiv" class="contentdiv">
             <div ng-repeat="preview in previews" 
@@ -34,7 +30,6 @@
              ng-class="{'highlighted-large': selectedImgSrc!=undefined, 'unhighlighted-large': selectedImgSrc==undefined}">
             <div id="locationdiv" ng-include="location.url">
             </div>
-            <!-- <div id="nonmanagerdiv" class="cusdiv" ng-include="NonManagerDiv"></div> -->   
             <div id="printerdiv1" class="cusdiv" ng-include="PrinterDiv1"></div>  
         </div>  
         <div id="printerdiv2" class="cusdiv contentdiv" ng-include="PrinterDiv2"></div>          

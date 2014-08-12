@@ -35,7 +35,6 @@
         <ion-list>
             <a ng-repeat="job in jobs | filter:overview.query | orderBy:orderProp:reverse" class="item item-avatar" href="#/{{user.name}}/jobs/{{job.id}}">
                 <img class="front" src="img/jobs/{{job.id}}/front.jpg" alt="front" title="front" />
-                <!-- <img class="back"src="/img/jobs/{{job.id}}/back.jpg" alt="Back"> -->
                 <h2>{{job.id}}</h2>
                 <p>{{job.name}}</p>
                 <p>Facility: {{job.facility_id}}</p>

@@ -33,23 +33,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       controller: 'LoginCtrl'
     })
 
-    // .state('user', {
-    //   url: "/:username",
-    //   templateUrl: "templates/navview.html",
-    //   abstract: true
-    // })
-
     .state('overview', {
       url: '/:username/jobs',
       templateUrl: "templates/overview.html", 
       controller: 'OverviewCtrl'
     })
-
-    // .state('job', {
-    //   url: "/job",
-    //   templateUrl: "templates/navview.html",
-    //   abstract: true
-    // })
 
     .state('jobview', {
       url: '/:username/jobs/:jobId',
@@ -57,12 +45,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       controller: 'JobviewCtrl'
     });
 
-    // .state('managerJobview', {
-    //   url: '/manager/:userId/:jobId',
-    //   templateUrl: "templates/jobview.html", 
-    //   controller: 'JobviewCtrl'
-    // });
-  
   $urlRouterProvider.otherwise('/login');
 });
 
