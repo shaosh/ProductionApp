@@ -51,6 +51,12 @@
 						"job_id": 554114,
 						"location_id": 0,
 						"print_status_id": 3
+					},
+					{
+						"id": 4,
+						"job_id": 554114,
+						"location_id": 0,
+						"print_status_id": 4
 					}	
 				]
 			},
@@ -80,6 +86,12 @@
 				"job_id": 554114,
 				"staff_id": 2,
 				"role_id": 1
+			},
+			{
+				"id": 0,
+				"job_id": 554114,
+				"staff_id": 0,
+				"role_id": 0
 			}
 		],
 		"log": [
